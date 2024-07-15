@@ -1,8 +1,0 @@
-input: '/path/to/samplesheet_rna.csv'
-outdir: '/path/to/output_rna'
-genome: 'GRCh37'
-fasta: '/path/to/Homo_sapiens/rna_hs37d5/hs37d5.fa'
-gtf: '/path/to/Homo_sapiens/rna_hs37d5/gencode.v19.chr_patch_hapl_scaff.annotation.gtf'
-star_index: '/path/to/Homo_sapiens/rna_hs37d5/star'
-rsem_index: '/path/to/Homo_sapiens/rna_hs37d5/rsem'
-salmon_index: '/path/to/Homo_sapiens/rna_hs37d5/salmon'

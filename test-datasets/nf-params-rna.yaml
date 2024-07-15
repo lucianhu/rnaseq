@@ -1,0 +1,4 @@
+input: 'samplesheet_test.csv'
+outdir: 'output_'
+fasta: 'reference/genome.fasta'
+gtf: 'reference/genes_with_empty_tid.gtf'
