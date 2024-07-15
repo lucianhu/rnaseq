@@ -35,8 +35,7 @@ params.kallisto_index   = WorkflowMain.getGenomeAttribute(params, 'kallisto')
     VALIDATE & PRINT PARAMETER SUMMARY
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-
-include { validateParameters; paramsHelp } from '../plugins/nf-validation-1.1.3'
+include { validateParameters; paramsHelp } from 'plugin/nf-validation'
 
 // Print help message if needed
 if (params.help) {
