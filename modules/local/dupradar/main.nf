@@ -2,10 +2,10 @@ process DUPRADAR {
     tag "$meta.id"
     label 'process_long'
 
-    conda "bioconda::bioconductor-dupradar=1.28.0"
+    conda "bioconda::bioconductor-dupradar=1.32.0"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/bioconductor-dupradar:1.28.0--r42hdfd78af_0' :
-        'biocontainers/bioconductor-dupradar:1.28.0--r42hdfd78af_0' }"
+        'https://depot.galaxyproject.org/singularity/bioconductor-dupradar:1.32.0--r43hdfd78af_0' :
+        'biocontainers/bioconductor-dupradar:1.32.0--r43hdfd78af_0' }"
 
     input:
     tuple val(meta), path(bam)

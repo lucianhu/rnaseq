@@ -2,10 +2,10 @@ process SORTMERNA {
     tag "$meta.id"
     label "process_high"
 
-    conda "bioconda::sortmerna=4.3.4"
+    conda "bioconda::sortmerna=4.3.7"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/sortmerna:4.3.4--h9ee0642_0' :
-        'biocontainers/sortmerna:4.3.4--h9ee0642_0' }"
+        'https://depot.galaxyproject.org/singularity/sortmerna:4.3.7--hdbdd923_1' :
+        'biocontainers/sortmerna:4.3.7--hdbdd923_1' }"
 
     input:
     tuple val(meta), path(reads)

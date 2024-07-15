@@ -4,8 +4,8 @@ process GFFREAD {
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/gffread:0.12.1--h8b12597_0' :
-        'biocontainers/gffread:0.12.1--h8b12597_0' }"
+        'https://depot.galaxyproject.org/singularity/gffread:0.12.7--hdcf5f25_4' :
+        'biocontainers/gffread:0.12.7--hdcf5f25_4' }"
 
     input:
     path gff

@@ -2,10 +2,10 @@ process SUBREAD_FEATURECOUNTS {
     tag "$meta.id"
     label 'process_medium'
 
-    conda "bioconda::subread=2.0.1"
+    conda "bioconda::subread=2.0.6"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/subread:2.0.1--hed695b0_0' :
-        'biocontainers/subread:2.0.1--hed695b0_0' }"
+        'https://depot.galaxyproject.org/singularity/subread:2.0.6--he4a0461_2' :
+        'biocontainers/subread:2.0.6--he4a0461_2' }"
 
     input:
     tuple val(meta), path(bams), path(annotation)
