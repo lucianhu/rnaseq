@@ -48,15 +48,36 @@
 > **Warning**
 > Quantification isn't performed if using `--aligner hisat2` due to the lack of an appropriate option to calculate accurate expression estimates from HISAT2 derived genomic alignments. However, you can use this route if you have a preference for the alignment, QC and other types of downstream analysis compatible with the output of HISAT2.
 
+## Installation
+First, install Nextflow using Conda and set up the required plugins and environment variables.
+
+```bash
+Copy code
+# Install Nextflow via Conda
+$ conda install -c bioconda nextflow
+
+# Clone the pipeline repository
+git clone https://github.com/lucianhu/rnaseq_nextflow.git
+
+# Copy plugins to Nextflow directory
+cp rnaseq_nextflow/plugins ~/.nextflow
+
+# Set the Conda cache directory for Nextflow
+echo "export NXF_CONDA_CACHEDIR=$HOME/.conda/cache_nextflow" >> ~/.bashrc
+
+# Source the updated bashrc to apply the changes
+source ~/.bashrc
+```
+
 ## Usage
 
 > [!NOTE]
 > If you are new to Nextflow and nf-core, please refer to [this page](https://nf-co.re/docs/usage/installation) on how to set-up Nextflow. Make sure to [test your setup](https://nf-co.re/docs/usage/introduction#how-to-run-a-pipeline) with `-profile test` before running the workflow on actual data.
 
-First, prepare a samplesheet with your input data that looks as follows:
+### Prepare a Samplesheet
+First, prepare a samplesheet with your input data. The samplesheet should be a CSV file formatted as follows:
 
-**samplesheet.csv**:
-
+`samplesheet.csv`
 ```csv
 sample,fastq_1,fastq_2,strandedness
 CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz,auto
@@ -64,26 +85,42 @@ CONTROL_REP1,AEG588A1_S1_L003_R1_001.fastq.gz,AEG588A1_S1_L003_R2_001.fastq.gz,a
 CONTROL_REP1,AEG588A1_S1_L004_R1_001.fastq.gz,AEG588A1_S1_L004_R2_001.fastq.gz,auto
 ```
 
-Each row represents a fastq file (single-end) or a pair of fastq files (paired end). Rows with the same sample identifier are considered technical replicates and merged automatically. The strandedness refers to the library preparation and will be automatically inferred if set to `auto`.
+Each row represents a single-end fastq file or a pair of fastq files (paired-end). Rows with the same sample identifier are considered technical replicates and will be merged automatically. The strandedness of the library preparation will be automatically inferred if set to auto.
 
-> **Warning:**
-> Please provide pipeline parameters via the CLI or Nextflow `-params-file` option. Custom config files including those
-> provided by the `-c` Nextflow option can be used to provide any configuration _**except for parameters**_;
-> see [docs](https://nf-co.re/usage/configuration#custom-configuration-files).
+### Prepare a Parameters File
 
-Now, you can run the pipeline using:
+Prepare a YAML file with the necessary pipeline parameters. Note that parameters must be provided via the CLI or the Nextflow -params-file option. Custom config files (via the -c Nextflow option) can be used for other configurations except for parameters like input, outdir, fasta, and gtf.
 
-```bash
-nextflow run nf-core/rnaseq \
-    --input samplesheet.csv \
-    --outdir <OUTDIR> \
-    --genome GRCh37 \
-    -profile <docker/singularity/.../institute>
+`nf-params-rna.yaml`
+```yaml
+input: '/path/to/samplesheet.csv'
+outdir: '/path/to/output_dir'
+fasta: '/path/to/references/genome.fa'
+gtf: '/path/to/references/annotation.gtf'
+star_index: '/path/to/genome/star_index_dir'
 ```
 
 > [!WARNING]
 > Please provide pipeline parameters via the CLI or Nextflow `-params-file` option. Custom config files including those provided by the `-c` Nextflow option can be used to provide any configuration _**except for parameters**_;
 > see [docs](https://nf-co.re/usage/configuration#custom-configuration-files).
+
+### Run the Pipeline
+
+Execute the Nextflow pipeline using the following command:
+
+```bash
+$ nextflow run /path/to/rnaseq_nextflow/main.nf -profile conda -params-file nf-params-rna.yaml -work-dir path/to/work_dir
+```
+
+### Run Testing Sample
+To run a test sample, navigate to the test datasets directory and execute the pipeline:
+
+```bash
+$ cd rnaseq_nextflow/test-datasets
+$ nextflow run /path/to/rnaseq_nextflow/main.nf -profile conda -params-file nf-params-rna.yaml -work-dir path/to/work_dir
+```
+
+This will process the test datasets and ensure the pipeline is functioning correctly.
 
 For more details and further functionality, please refer to the [usage documentation](https://nf-co.re/rnaseq/usage) and the [parameter documentation](https://nf-co.re/rnaseq/parameters).
 
