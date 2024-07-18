@@ -69,10 +69,10 @@ echo "export NXF_CONDA_CACHEDIR=$HOME/.conda/cache_nextflow" >> ~/.bashrc
 source ~/.bashrc
 ```
 
-## Usage
-
 > [!NOTE]
-> If you are new to Nextflow and nf-core, please refer to [this page](https://nf-co.re/docs/usage/installation) on how to set-up Nextflow. Make sure to [test your setup](https://nf-co.re/docs/usage/introduction#how-to-run-a-pipeline) with `-profile test` before running the workflow on actual data.
+> If you are new to Nextflow and nf-core, please refer to [this page](https://nf-co.re/docs/usage/installation) on how to set-up Nextflow.
+
+## Usage
 
 ### Prepare a Samplesheet
 First, prepare a samplesheet with your input data. The samplesheet should be a CSV file formatted as follows:
@@ -89,7 +89,7 @@ Each row represents a single-end fastq file or a pair of fastq files (paired-end
 
 ### Prepare a Parameters File
 
-Prepare a YAML file with the necessary pipeline parameters. Note that parameters must be provided via the CLI or the Nextflow -params-file option. Custom config files (via the -c Nextflow option) can be used for other configurations except for parameters like input, output_dir, fasta, and gtf.
+Prepare a YAML file with the necessary pipeline parameters. 
 
 `nf-params-rna.yaml`
 ```yaml
