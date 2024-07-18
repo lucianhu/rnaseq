@@ -89,7 +89,7 @@ Each row represents a single-end fastq file or a pair of fastq files (paired-end
 
 ### Prepare a Parameters File
 
-Prepare a YAML file with the necessary pipeline parameters. Note that parameters must be provided via the CLI or the Nextflow -params-file option. Custom config files (via the -c Nextflow option) can be used for other configurations except for parameters like input, outdir, fasta, and gtf.
+Prepare a YAML file with the necessary pipeline parameters. Note that parameters must be provided via the CLI or the Nextflow -params-file option. Custom config files (via the -c Nextflow option) can be used for other configurations except for parameters like input, output_dir, fasta, and gtf.
 
 `nf-params-rna.yaml`
 ```yaml
