@@ -80,9 +80,18 @@ First, prepare a samplesheet with your input data. The samplesheet should be a C
 `samplesheet.csv`
 ```csv
 sample,fastq_1,fastq_2,strandedness
+CONTROL_REP1,AEG588A1_S1_L001_R1_001.fastq.gz,AEG588A1_S1_L001_R2_001.fastq.gz,auto
 CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz,auto
-CONTROL_REP1,AEG588A1_S1_L003_R1_001.fastq.gz,AEG588A1_S1_L003_R2_001.fastq.gz,auto
-CONTROL_REP1,AEG588A1_S1_L004_R1_001.fastq.gz,AEG588A1_S1_L004_R2_001.fastq.gz,auto
+CONTROL_REP2,AEG588A1_S1_L003_R1_001.fastq.gz,AEG588A1_S1_L003_R2_001.fastq.gz,auto
+CONTROL_REP2,AEG588A1_S1_L004_R1_001.fastq.gz,AEG588A1_S1_L004_R2_001.fastq.gz,auto
+CONTROL_REP3,AEG588A1_S1_L005_R1_001.fastq.gz,AEG588A1_S1_L005_R2_001.fastq.gz,auto
+CONTROL_REP3,AEG588A1_S1_L006_R1_001.fastq.gz,AEG588A1_S1_L006_R2_001.fastq.gz,auto
+TREATMENT_REP1,AEG588A1_S1_L007_R4_001.fastq.gz,AEG588A1_S1_L007_R2_001.fastq.gz,auto
+TREATMENT_REP1,AEG588A1_S1_L008_R1_001.fastq.gz,AEG588A1_S1_L008_R2_001.fastq.gz,auto
+TREATMENT_REP2,AEG588A1_S1_L009_R5_001.fastq.gz,AEG588A1_S1_L009_R2_001.fastq.gz,auto
+TREATMENT_REP2,AEG588A1_S1_L010_R1_001.fastq.gz,AEG588A1_S1_L010_R2_001.fastq.gz,auto
+TREATMENT_REP3,AEG588A1_S1_L011_R1_001.fastq.gz,AEG588A1_S1_L011_R2_001.fastq.gz,auto
+TREATMENT_REP3,AEG588A1_S1_L012_R1_001.fastq.gz,AEG588A1_S1_L012_R2_001.fastq.gz,auto
 ```
 
 Each row represents a single-end fastq file or a pair of fastq files (paired-end). Rows with the same sample identifier are considered technical replicates and will be merged automatically. The strandedness of the library preparation will be automatically inferred if set to auto.
