@@ -2,7 +2,12 @@
 
 ## Introduction
 
-This document describes the output produced by the pipeline. Most of the plots are taken from the MultiQC report generated from the [full-sized test dataset](https://github.com/nf-core/test-datasets/tree/rnaseq#full-test-dataset-origin) for the pipeline using a command similar to the one below:
+This document outlines the output from the basic RNA-seq pipeline on the UKHD system using default tools and parameters. For the full version with different tools, please refer to the [complete documentation](https://github.com/lucianhu/rnaseq_nextflow/blob/master/docs/output.md).
+
+> **Warning**
+> Running Nextflow on Docker is insecure and requires administrative privileges. Using Conda is more secure and allows users to run Nextflow without needing special permissions.
+
+Most of the plots are taken from the MultiQC report generated from the [full-sized test dataset](https://github.com/nf-core/test-datasets/tree/rnaseq#full-test-dataset-origin) for the pipeline using a command similar to the one below:
 
 ```bash
 nextflow run nf-core/rnaseq -profile test_full,<docker/singularity/institute>
