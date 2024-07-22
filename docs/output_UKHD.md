@@ -1,4 +1,4 @@
-# nf-core/rnaseq: Output
+# nf-core/rnaseq: Output on the UKHD system
 
 ## Introduction
 
@@ -10,7 +10,7 @@ This document outlines the output from the basic RNA-seq pipeline on the UKHD sy
 Most of the plots are taken from the MultiQC report generated from the [full-sized test dataset](https://github.com/nf-core/test-datasets/tree/rnaseq#full-test-dataset-origin) for the pipeline using a command similar to the one below:
 
 ```bash
-nextflow run nf-core/rnaseq -profile test_full,<docker/singularity/institute>
+$ nextflow run /path/to/rnaseq_nextflow/main.nf -profile conda -params-file nf-params-rna.yaml -work-dir path/to/work_dir
 ```
 
 The directories listed below will be created in the results directory after the pipeline has finished. All paths are relative to the top-level results directory.
