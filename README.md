@@ -121,6 +121,9 @@ Execute the Nextflow pipeline using the following command:
 $ nextflow run /path/to/rnaseq_nextflow/main.nf -profile conda -params-file nf-params-rna.yaml -work-dir path/to/work_dir
 ```
 
+> [!WARNING]
+> Running Nextflow on Docker is insecure and requires administrative privileges. Using Conda is more secure and allows users to run Nextflow without needing special permissions.
+
 ### Run Testing Sample
 To run a test sample, navigate to the test datasets directory and execute the pipeline:
 
