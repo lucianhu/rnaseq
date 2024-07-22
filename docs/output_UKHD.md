@@ -20,20 +20,12 @@ The directories listed below will be created in the results directory after the 
 The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes data using the following steps:
 
 - [Preprocessing](#preprocessing)
-  - [cat](#cat) - Merge re-sequenced FastQ files
   - [FastQC](#fastqc) - Raw read QC
-  - [UMI-tools extract](#umi-tools-extract) - UMI barcode extraction
   - [TrimGalore](#trimgalore) - Adapter and quality trimming
-  - [fastp](#fastp) - Adapter and quality trimming
-  - [BBSplit](#bbsplit) - Removal of genome contaminants
-  - [SortMeRNA](#sortmerna) - Removal of ribosomal RNA
 - [Alignment and quantification](#alignment-and-quantification)
   - [STAR and Salmon](#star-and-salmon) - Fast spliced aware genome alignment and transcriptome quantification
-  - [STAR via RSEM](#star-via-rsem) - Alignment and quantification of expression levels
-  - [HISAT2](#hisat2) - Memory efficient splice aware alignment to a reference
 - [Alignment post-processing](#alignment-post-processing)
   - [SAMtools](#samtools) - Sort and index alignments
-  - [UMI-tools dedup](#umi-tools-dedup) - UMI-based deduplication
   - [picard MarkDuplicates](#picard-markduplicates) - Duplicate read marking
 - [Other steps](#other-steps)
   - [StringTie](#stringtie) - Transcript assembly and quantification
@@ -42,32 +34,25 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
   - [RSeQC](#rseqc) - Various RNA-seq QC metrics
   - [Qualimap](#qualimap) - Various RNA-seq QC metrics
   - [dupRadar](#dupradar) - Assessment of technical / biological read duplication
-  - [Preseq](#preseq) - Estimation of library complexity
   - [featureCounts](#featurecounts) - Read counting relative to gene biotype
   - [DESeq2](#deseq2) - PCA plot and sample pairwise distance heatmap and dendrogram
   - [MultiQC](#multiqc) - Present QC for raw reads, alignment, read counting and sample similiarity
-- [Pseudoalignment and quantification](#pseudoalignment-and-quantification)
-  - [Salmon](#pseudoalignment) - Wicked fast gene and isoform quantification relative to the transcriptome
-  - [Kallisto](#pseudoalignment) - Near-optimal probabilistic RNA-seq quantification
 - [Workflow reporting and genomes](#workflow-reporting-and-genomes)
   - [Reference genome files](#reference-genome-files) - Saving reference genome indices/files
   - [Pipeline information](#pipeline-information) - Report metrics generated during the workflow execution
 
 ## Preprocessing
 
-### cat
-
-<details markdown="1">
-<summary>Output files</summary>
-
-- `fastq/`
-  - `*.merged.fastq.gz`: If `--save_merged_fastq` is specified, concatenated FastQ files will be placed in this directory.
-
-</details>
-
-If multiple libraries/runs have been provided for the same sample in the input samplesheet (e.g. to increase sequencing depth) then these will be merged at the very beginning of the pipeline in order to have consistent sample naming throughout the pipeline. Please refer to the [usage documentation](https://nf-co.re/rnaseq/usage#samplesheet-input) to see how to specify these samples in the input samplesheet.
-
 ### FastQC
+
+[FastQC](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/) gives general quality metrics about your sequenced reads. It provides information about the quality score distribution across your reads, per base sequence content (%A/T/G/C), adapter contamination and overrepresented sequences. For further reading and documentation see the [FastQC help pages](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/).
+
+```bash
+fastqc \\
+        $args \\
+        --threads $task.cpus \\
+        $renamed_files
+```
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -76,11 +61,9 @@ If multiple libraries/runs have been provided for the same sample in the input s
   - `*_fastqc.html`: FastQC report containing quality metrics.
   - `*_fastqc.zip`: Zip archive containing the FastQC report, tab-delimited data file and plot images.
 
-> **NB:** The FastQC plots in this directory are generated relative to the raw, input reads. They may contain adapter sequence and regions of low quality. To see how your reads look after adapter and quality trimming please refer to the FastQC reports in the `trimgalore/fastqc/` directory.
-
 </details>
 
-[FastQC](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/) gives general quality metrics about your sequenced reads. It provides information about the quality score distribution across your reads, per base sequence content (%A/T/G/C), adapter contamination and overrepresented sequences. For further reading and documentation see the [FastQC help pages](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/).
+> **NB:** The FastQC plots in this directory are generated relative to the raw, input reads. They may contain adapter sequence and regions of low quality. To see how your reads look after adapter and quality trimming please refer to the FastQC reports in the `trimgalore/fastqc/` directory.
 
 ![MultiQC - FastQC sequence counts plot](images/mqc_fastqc_counts.png)
 
