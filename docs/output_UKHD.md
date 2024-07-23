@@ -180,8 +180,17 @@ The `tximport`  package summarizes Salmon results into matrices for differential
 
 ```bash    
 # Imports Salmon quantification data into R using tximport
-$ tximport.r NULL quants salmon.merged salmon tx2gene.tsv
+$ tximport.r \
+    NULL \                      # Placeholder for additional options (no extra options specified here)
+    quants \                    # Directory or file path containing Salmon quantification results (e.g., TPM, counts)
+    salmon.merged \             # Output directory or prefix where the summarized results will be saved
+    salmon \                    # Indicates that Salmon was used for quantification
+    tx2gene.tsv                 # File mapping transcript IDs to gene IDs for aggregation of transcript-level data to gene-level
+```
 
+The `summarizedexperiment.r` command imports gene expression data into `R` and creates SummarizedExperiment objects (`*.rds`). It uses gene-level count data and TPM values from Salmon, along with a mapping file (`tx2gene.tsv`) that connects transcript IDs to gene IDs. This process helps organize and prepare the data for subsequent analysis, such as differential expression analysis or other downstream tasks.
+
+```bash
 # Creates SummarizedExperiment objects from gene counts and TPM data
 $ summarizedexperiment.r NULL salmon.merged.gene_counts.tsv salmon.merged.gene_tpm.tsv tx2gene.tsv
 $ summarizedexperiment.r NULL salmon.merged.gene_counts_length_scaled.tsv salmon.merged.gene_tpm.tsv tx2gene.tsv
