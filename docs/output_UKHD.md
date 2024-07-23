@@ -50,10 +50,10 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 > **NB:** The FastQC plots in this directory are generated relative to the raw, input reads. They may contain adapter sequence and regions of low quality. To see how your reads look after adapter and quality trimming please refer to the FastQC reports in the `trimgalore/fastqc/` directory.
 
 ```bash
-fastqc \\
-        $args \\
-        --threads $task.cpus \\
-        $renamed_files
+$ fastqc \
+    --quiet \
+    --threads 6 \
+    $read _1.fastq.gz $read_2.fastq.gz
 ```
 
 <details markdown="1">
@@ -76,6 +76,16 @@ fastqc \\
 [Trim Galore!](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/) is a wrapper tool around Cutadapt and FastQC to peform quality and adapter trimming on FastQ files. Cutadapt identifies and removes adapter sequences, primers, poly-A tails, and other unwanted sequences from high-throughput sequencing reads. FastQC, on the other hand, assesses the quality of the sequencing data. It is the default trimming tool used by this pipeline, however you can use fastp instead by specifying the `--trimmer fastp` parameter. You can specify additional options for Trim Galore! via the `--extra_trimgalore_args` parameters.
 
 > **NB:** TrimGalore! will only run using multiple cores if you are able to use more than > 5 and > 6 CPUs for single- and paired-end data, respectively. The total cores available to TrimGalore! will also be capped at 4 (7 and 8 CPUs in total for single- and paired-end data, respectively) because there is no longer a run-time benefit. See [release notes](https://github.com/FelixKrueger/TrimGalore/blob/master/Changelog.md#version-060-release-on-1-mar-2019) and [discussion whilst adding this logic to the nf-core/atacseq pipeline](https://github.com/nf-core/atacseq/pull/65).
+
+```bash
+$ trim_galore \
+    --fastqc_args '-t 12' \
+    --cores 8 \
+    --paired \
+    --gzip \
+    $read_1.fastq.gz \
+    $read_2.fastq.gz
+```
 
 <details markdown="1">
 <summary>Output files</summary>
