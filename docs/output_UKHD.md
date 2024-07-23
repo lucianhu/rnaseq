@@ -47,6 +47,8 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 
 [FastQC](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/) gives general quality metrics about your sequenced reads. It provides information about the quality score distribution across your reads, per base sequence content (%A/T/G/C), adapter contamination and overrepresented sequences. For further reading and documentation see the [FastQC help pages](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/).
 
+> **NB:** The FastQC plots in this directory are generated relative to the raw, input reads. They may contain adapter sequence and regions of low quality. To see how your reads look after adapter and quality trimming please refer to the FastQC reports in the `trimgalore/fastqc/` directory.
+
 ```bash
 fastqc \\
         $args \\
@@ -63,8 +65,6 @@ fastqc \\
 
 </details>
 
-> **NB:** The FastQC plots in this directory are generated relative to the raw, input reads. They may contain adapter sequence and regions of low quality. To see how your reads look after adapter and quality trimming please refer to the FastQC reports in the `trimgalore/fastqc/` directory.
-
 ![MultiQC - FastQC sequence counts plot](images/mqc_fastqc_counts.png)
 
 ![MultiQC - FastQC mean quality scores plot](images/mqc_fastqc_quality.png)
@@ -72,6 +72,10 @@ fastqc \\
 ![MultiQC - FastQC adapter content plot](images/mqc_fastqc_adapter.png)
 
 ### TrimGalore
+
+[Trim Galore!](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/) is a wrapper tool around Cutadapt and FastQC to peform quality and adapter trimming on FastQ files. Cutadapt identifies and removes adapter sequences, primers, poly-A tails, and other unwanted sequences from high-throughput sequencing reads. FastQC, on the other hand, assesses the quality of the sequencing data. It is the default trimming tool used by this pipeline, however you can use fastp instead by specifying the `--trimmer fastp` parameter. You can specify additional options for Trim Galore! via the `--extra_trimgalore_args` parameters.
+
+> **NB:** TrimGalore! will only run using multiple cores if you are able to use more than > 5 and > 6 CPUs for single- and paired-end data, respectively. The total cores available to TrimGalore! will also be capped at 4 (7 and 8 CPUs in total for single- and paired-end data, respectively) because there is no longer a run-time benefit. See [release notes](https://github.com/FelixKrueger/TrimGalore/blob/master/Changelog.md#version-060-release-on-1-mar-2019) and [discussion whilst adding this logic to the nf-core/atacseq pipeline](https://github.com/nf-core/atacseq/pull/65).
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -85,72 +89,7 @@ fastqc \\
 
 </details>
 
-[Trim Galore!](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/) is a wrapper tool around Cutadapt and FastQC to peform quality and adapter trimming on FastQ files. Cutadapt identifies and removes adapter sequences, primers, poly-A tails, and other unwanted sequences from high-throughput sequencing reads. FastQC, on the other hand, assesses the quality of the sequencing data. It is the default trimming tool used by this pipeline, however you can use fastp instead by specifying the `--trimmer fastp` parameter. You can specify additional options for Trim Galore! via the `--extra_trimgalore_args` parameters.
-
-> **NB:** TrimGalore! will only run using multiple cores if you are able to use more than > 5 and > 6 CPUs for single- and paired-end data, respectively. The total cores available to TrimGalore! will also be capped at 4 (7 and 8 CPUs in total for single- and paired-end data, respectively) because there is no longer a run-time benefit. See [release notes](https://github.com/FelixKrueger/TrimGalore/blob/master/Changelog.md#version-060-release-on-1-mar-2019) and [discussion whilst adding this logic to the nf-core/atacseq pipeline](https://github.com/nf-core/atacseq/pull/65).
-
 ![MultiQC - cutadapt trimmed sequence length plot](images/mqc_cutadapt_trimmed.png)
-
-### fastp
-
-<details markdown="1">
-<summary>Output files</summary>
-
-- `fastp/`
-  - `*.fastq.gz`: If `--save_trimmed` is specified, FastQ files **after** adapter trimming will be placed in this directory.
-  - `*.fastp.html`: Trimming report in html format.
-  - `*.fastp.json`: Trimming report in json format.
-- `fastp/log/`
-  - `*.fastp.log`: Trimming log file.
-- `fastp/fastqc/`
-  - `*_fastqc.html`: FastQC report containing quality metrics for read 1 (_and read2 if paired-end_) **after** adapter trimming.
-  - `*_fastqc.zip`: Zip archive containing the FastQC report, tab-delimited data file and plot images.
-
-</details>
-
-[fastp](https://github.com/OpenGene/fastp) is a tool designed to provide fast, all-in-one preprocessing for FastQ files. It has been developed in C++ with multithreading support to achieve higher performance. fastp can be used in this pipeline for standard adapter trimming and quality filtering by setting the `--trimmer fastp` parameter. You can specify additional options for fastp via the `--extra_fastp_args` parameter.
-
-![MultiQC - fastp filtered reads plot](images/mqc_fastp_plot.png)
-
-### BBSplit
-
-<details markdown="1">
-<summary>Output files</summary>
-
-- `bbsplit/`
-  - `*.fastq.gz`: If `--save_bbsplit_reads` is specified FastQ files split by reference will be saved to the results directory. Reads from the main reference genome will be named "_primary_.fastq.gz". Reads from contaminating genomes will be named "_<SHORT_NAME>_.fastq.gz" where `<SHORT_NAME>` is the first column in `--bbsplit_fasta_list` that needs to be provided to initially build the index.
-  - `*.txt`: File containing statistics on how many reads were assigned to each reference.
-
-</details>
-
-[BBSplit](http://seqanswers.com/forums/showthread.php?t=41288) is a tool that bins reads by mapping to multiple references simultaneously, using BBMap. The reads go to the bin of the reference they map to best. There are also disambiguation options, such that reads that map to multiple references can be binned with all of them, none of them, one of them, or put in a special "ambiguous" file for each of them.
-
-This functionality would be especially useful, for example, if you have [mouse PDX](https://en.wikipedia.org/wiki/Patient_derived_xenograft) samples that contain a mixture of human and mouse genomic DNA/RNA and you would like to filter out any mouse derived reads.
-
-The BBSplit index will have to be built at least once with this pipeline by providing [`--bbsplit_fasta_list`](https://nf-co.re/rnaseq/parameters#bbsplit_fasta_list) which has to be a file containing 2 columns: short name and full path to reference genome(s):
-
-```bash
-mm10,/path/to/mm10.fa
-ecoli,/path/to/ecoli.fa
-sarscov2,/path/to/sarscov2.fa
-```
-
-You can save the index by using the [`--save_reference`](https://nf-co.re/rnaseq/parameters#save_reference) parameter and then provide it via [`--bbsplit_index`](https://nf-co.re/rnaseq/parameters#bbsplit_index) for future runs. As described in the `Output files` dropdown box above the FastQ files relative to the main reference genome will always be called `*primary*.fastq.gz`.
-
-### SortMeRNA
-
-<details markdown="1">
-<summary>Output files</summary>
-
-- `sortmerna/`
-  - `*.fastq.gz`: If `--save_non_ribo_reads` is specified, FastQ files containing non-rRNA reads will be placed in this directory.
-  - `*.log`: Log file generated by SortMeRNA with information regarding reads that matched the reference database(s).
-
-</details>
-
-When `--remove_ribo_rna` is specified, the pipeline uses [SortMeRNA](https://github.com/biocore/sortmerna) for the removal of ribosomal RNA. By default, [rRNA databases](https://github.com/biocore/sortmerna/tree/master/data/rRNA_databases) defined in the SortMeRNA GitHub repo are used. You can see an example in the pipeline Github repository in `assets/rrna-default-dbs.txt` which is used by default via the `--ribo_database_manifest` parameter. Please note that commercial/non-academic entities require [`licensing for SILVA`](https://www.arb-silva.de/silva-license-information) for these default databases.
-
-![MultiQC - SortMeRNA hit count plot](images/mqc_sortmerna.png)
 
 ## Alignment and quantification
 
