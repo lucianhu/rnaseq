@@ -208,12 +208,12 @@ $ summarizedexperiment.r NULL salmon.merged.transcript_counts.tsv salmon.merged.
   - `tx2gene.tsv`: Tab-delimited file containing gene to transcripts IDs mappings.
   </details>
 
-An additional subset of files are distinct to each tool, for Salmon:
+Additional files for Salmon:
 
 <details markdown="1">
 <summary>Output files</summary>
 
-- `salmon/<SAMPLE>/`
+- `salmon/${SAMPLE}/`
   - `aux_info/`: Auxiliary info e.g. versions and number of mapped reads.
   - `cmd_info.json`: Information about the Salmon quantification command, version and options.
   - `lib_format_counts.json`: Number of fragments assigned, unassigned and incompatible.
