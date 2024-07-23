@@ -162,20 +162,6 @@ $ cat genome.transcripts.fa genome.fa > gentrome.fa
 # Indexes the combined gentrome file for Salmon, using the decoy sequences
 $ salmon index --threads 6 -t gentrome.fa -d decoys.txt -k 31 -i salmon
 
-# Subsamples the input fastq files to 1,000,000 records each, with a set seed for reproducibility
-$ fq subsample --record-count 1000000 --seed 1 ${SAMPLE}_1_val_1.fq.gz ${SAMPLE}_2_val_2.fq.gz \
-    --r1-dst ${SAMPLE}.subsampled_R1.fastq.gz --r2-dst ${SAMPLE}.subsampled_R2.fastq.gz
-    
-# Quantifies transcript abundances using Salmon with a gene map and library type auto-detection
-$ salmon quant --geneMap genome.gtf --threads 6 --libType=A \
-    --index salmon -1 ${SAMPLE}.subsampled_R1.fastq.gz -2 ${SAMPLE}.subsampled_R2.fastq.gz \
-    --skipQuant -o ${SAMPLE}
-
-# If the meta_info.json file exists, copy it to the current directory with a modified name
-$ if [ -f ${SAMPLE}/aux_info/meta_info.json ]; then
-    cp ${SAMPLE}/aux_info/meta_info.json "${SAMPLE}_meta_info.json"
-fi
-
 # Quantifies transcript abundances using Salmon with alignment-based input and library type ISR
 $ salmon quant --geneMap genome.gtf --threads 6 --libType=ISR \
     -t genome.transcripts.fa -a ${SAMPLE}.Aligned.toTranscriptome.out.bam -o ${SAMPLE}
