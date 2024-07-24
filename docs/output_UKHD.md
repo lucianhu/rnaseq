@@ -23,18 +23,19 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
   - [FastQC](#fastqc) - Raw read QC
   - [TrimGalore](#trimgalore) - Adapter and quality trimming
 - [Alignment and quantification](#alignment-and-quantification)
-  - [STAR and Salmon](#star-and-salmon) - Fast spliced aware genome alignment and transcriptome quantification
+  - [STAR](#star) - Fast spliced aware genome alignment
+  - [Salmon](#salmon) - Transcriptome quantification
 - [Alignment post-processing](#alignment-post-processing)
   - [SAMtools](#samtools) - Sort and index alignments
   - [picard MarkDuplicates](#picard-markduplicates) - Duplicate read marking
 - [Other steps](#other-steps)
   - [StringTie](#stringtie) - Transcript assembly and quantification
+  - [featureCounts](#featurecounts) - Read counting relative to gene biotype
   - [BEDTools and bedGraphToBigWig](#bedtools-and-bedgraphtobigwig) - Create bigWig coverage files
 - [Quality control](#quality-control)
   - [RSeQC](#rseqc) - Various RNA-seq QC metrics
   - [Qualimap](#qualimap) - Various RNA-seq QC metrics
   - [dupRadar](#dupradar) - Assessment of technical / biological read duplication
-  - [featureCounts](#featurecounts) - Read counting relative to gene biotype
   - [DESeq2](#deseq2) - PCA plot and sample pairwise distance heatmap and dendrogram
   - [MultiQC](#multiqc) - Present QC for raw reads, alignment, read counting and sample similiarity
 - [Workflow reporting and genomes](#workflow-reporting-and-genomes)
