@@ -299,13 +299,13 @@ $ picard \
 <details markdown="1">
 <summary>Output files</summary>
 
-- `<ALIGNER>/`
+- `star_salmon/`
   - `${SAMPLE}.markdup.sorted.bam`: Sorted BAM files are necessary for many downstream analyses, such as variant calling, visualization in genome browsers, and various statistical analyses.
   - `${SAMPLE}.markdup.sorted.bam.bai`: BAI index file for coordinate sorted BAM file after duplicate marking. This is the final post-processed BAM index file and so will be saved by default in the results directory.
   - `${SAMPLE}.markdup.sorted.bam.csi`: CSI index file for coordinate sorted BAM file after duplicate marking. This is the final post-processed BAM index file and so will be saved by default in the results directory. Only generated if `--bam_csi_index` is specified as a parameter.
-- `<ALIGNER>/samtools_stats/`
+- `star_salmon/samtools_stats/`
   - SAMtools `${SAMPLE}.markdup.sorted.bam.flagstat`, `${SAMPLE}.markdup.sorted.bam.idxstats` and `${SAMPLE}.markdup.sorted.bam.stats` files generated from the duplicate marked alignment files.
-- `<ALIGNER>/picard_metrics/`
+- `star_salmon/picard_metrics/`
   - `${SAMPLE}.markdup.sorted.MarkDuplicates.metrics.txt`: Metrics file from MarkDuplicates.
 
 </details>
@@ -316,31 +316,89 @@ $ picard \
 
 ### StringTie
 
+[StringTie](https://ccb.jhu.edu/software/stringtie/) is a fast and highly efficient assembler of RNA-Seq alignments into potential transcripts. It uses a novel network flow algorithm as well as an optional de novo assembly step to assemble and quantitate full-length transcripts representing multiple splice variants for each gene locus. In order to identify differentially expressed genes between experiments, StringTie's output can be processed by specialized software like [Ballgown](https://github.com/alyssafrazee/ballgown), [Cuffdiff](http://cole-trapnell-lab.github.io/cufflinks/cuffdiff/index.html) or other programs ([DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html), [edgeR](https://bioconductor.org/packages/release/bioc/html/edgeR.html), etc.).
+
+```bash
+$ stringtie \  # Invoke StringTie for transcript assembly and quantification
+    ${SAMPLE}.markdup.sorted.bam \  # Input BAM file with aligned RNA-Seq reads (duplicates marked and sorted)
+    --rf \  # Assumes a stranded library with fr-firststrand orientation (reverse-forward)
+    -G genome.gtf \  # Reference annotation file in GTF format (mouse genome GRCm39)
+    -o ${SAMPLE}.transcripts.gtf \  # Output file for assembled transcripts in GTF format
+    -A ${SAMPLE}.gene.abundance.txt \  # Output file for gene-level abundance estimates (tab-delimited)
+    -C ${SAMPLE}.coverage.gtf \  # Output file for read coverage information in GTF format
+    -b ${SAMPLE}.ballgown \  # Output directory for Ballgown input files (*.ctab)
+    -p 6 \  # Number of threads to use for computation (6 threads)
+    -v \  # Enable verbose mode for detailed logging
+    -e  # Estimate expression only for transcripts present in the provided annotation (-G); no novel transcript assembly
+```
+
 <details markdown="1">
 <summary>Output files</summary>
 
-- `<ALIGNER>/stringtie/`
-  - `*.coverage.gtf`: GTF file containing transcripts that are fully covered by reads.
-  - `*.transcripts.gtf`: GTF file containing all of the assembled transcipts from StringTie.
-  - `*.gene_abundance.txt`: Text file containing gene aboundances and FPKM values.
-- `<ALIGNER>/stringtie/<SAMPLE>.ballgown/`: Ballgown output directory.
+- `star_salmon/stringtie/`
+  - `${SAMPLE}.coverage.gtf`: GTF file containing transcripts that are fully covered by reads.
+  - `${SAMPLE}.transcripts.gtf`: GTF file containing all of the assembled transcipts from StringTie.
+  - `${SAMPLE}.gene_abundance.txt`: Text file containing gene aboundances and FPKM values.
+- `star_salmon/stringtie/<SAMPLE>.ballgown/`: Ballgown output directory.
 
 </details>
 
-[StringTie](https://ccb.jhu.edu/software/stringtie/) is a fast and highly efficient assembler of RNA-Seq alignments into potential transcripts. It uses a novel network flow algorithm as well as an optional de novo assembly step to assemble and quantitate full-length transcripts representing multiple splice variants for each gene locus. In order to identify differentially expressed genes between experiments, StringTie's output can be processed by specialized software like [Ballgown](https://github.com/alyssafrazee/ballgown), [Cuffdiff](http://cole-trapnell-lab.github.io/cufflinks/cuffdiff/index.html) or other programs ([DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html), [edgeR](https://bioconductor.org/packages/release/bioc/html/edgeR.html), etc.).
+### featureCounts
 
-### BEDTools and bedGraphToBigWig
+[featureCounts](http://bioinf.wehi.edu.au/featureCounts/) from the [Subread](http://subread.sourceforge.net/) package is a quantification tool used to summarise the mapped read distribution over genomic features such as genes, exons, promotors, gene bodies, genomic bins and chromosomal locations. We can also use featureCounts to count overlaps with different classes of genomic features. This provides an additional QC to check which features are most abundant in the sample, and to highlight potential problems such as rRNA contamination.
+
+```bash
+# Quantify Read Counts
+$ featureCounts \
+    -B -C -g gene_biotype -t exon \  # Count reads mapping to exons, grouped by gene biotype
+    -p \  # Process paired-end reads
+    -T 6 \  # Use 6 threads for processing
+    -a genome.gtf \  # Reference annotation file in GTF format
+    -s 2 \  # Strandedness: reverse strand
+    -o ${SAMPLE}.featureCounts.txt \  # Output file for count results
+    ${SAMPLE}.markdup.sorted.bam  # Input BAM file with aligned RNA-Seq reads
+
+# Extract and Format Counts
+$ cut -f 1,7 ${SAMPLE}.featureCounts.txt | tail -n +3 | cat biotypes_header.txt - >> ${SAMPLE}.biotype_counts_mqc.tsv
+    # Extract columns 1 and 7 (gene IDs and counts) from featureCounts output,
+    # Skip the first two lines (header), 
+    # Concatenate with a predefined header file,
+    # Append the result to biotype counts file for MultiQC
+
+# Generate RNA Summary
+$ mqc_features_stat.py \
+    ${SAMPLE}.biotype_counts_mqc.tsv \  # Input file with biotype counts
+    -s ${SAMPLE} \  # Sample identifier for naming and labeling
+    -f rRNA \  # Focus on rRNA biotype
+    -o ${SAMPLE}.biotype_counts_rrna_mqc.tsv  # Output file for rRNA counts summary
+```
 
 <details markdown="1">
 <summary>Output files</summary>
 
-- `<ALIGNER>/bigwig/`
+- `<ALIGNER>/featurecounts/`
+  - `*.featureCounts.txt`: featureCounts biotype-level quantification results for each sample.
+  - `*.featureCounts.txt.summary`: featureCounts summary file containing overall statistics about the counts.
+  - `*_mqc.tsv`: MultiQC custom content files used to plot biotypes in report.
+
+</details>
+
+![MultiQC - featureCounts biotypes plot](images/mqc_featurecounts_biotype.png)
+
+### BEDTools and bedGraphToBigWig
+
+The [bigWig](https://genome.ucsc.edu/goldenpath/help/bigWig.html) format is an indexed binary format useful for displaying dense, continuous data in Genome Browsers such as the [UCSC](https://genome.ucsc.edu/cgi-bin/hgTracks) and [IGV](http://software.broadinstitute.org/software/igv/). This mitigates the need to load the much larger BAM files for data visualisation purposes which will be slower and result in memory issues. The bigWig format is also supported by various bioinformatics software for downstream processing such as meta-profile plotting.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `star_salmon/bigwig/`
   - `*.forward.bigWig`: bigWig coverage file relative to genes on the forward DNA strand.
   - `*.reverse.bigWig`: bigWig coverage file relative to genes on the reverse DNA strand.
 
 </details>
 
-The [bigWig](https://genome.ucsc.edu/goldenpath/help/bigWig.html) format is an indexed binary format useful for displaying dense, continuous data in Genome Browsers such as the [UCSC](https://genome.ucsc.edu/cgi-bin/hgTracks) and [IGV](http://software.broadinstitute.org/software/igv/). This mitigates the need to load the much larger BAM files for data visualisation purposes which will be slower and result in memory issues. The bigWig format is also supported by various bioinformatics software for downstream processing such as meta-profile plotting.
+
 
 ## Quality control
 
@@ -590,22 +648,6 @@ See [dupRadar docs](https://www.bioconductor.org/packages/devel/bioc/vignettes/d
 The [Preseq](http://smithlabresearch.org/software/preseq/) package is aimed at predicting and estimating the complexity of a genomic sequencing library, equivalent to predicting and estimating the number of redundant reads from a given sequencing depth and how many will be expected from additional sequencing using an initial sequencing experiment. The estimates can then be used to examine the utility of further sequencing, optimize the sequencing depth, or to screen multiple libraries to avoid low complexity samples. A shallow curve indicates that the library has reached complexity saturation and further sequencing would likely not add further unique reads. The dashed line shows a perfectly complex library where total reads = unique reads. Note that these are predictive numbers only, not absolute. The MultiQC plot can sometimes give extreme sequencing depth on the X axis - click and drag from the left side of the plot to zoom in on more realistic numbers.
 
 ![MultiQC - Preseq library complexity plot](images/mqc_preseq_plot.png)
-
-### featureCounts
-
-<details markdown="1">
-<summary>Output files</summary>
-
-- `<ALIGNER>/featurecounts/`
-  - `*.featureCounts.txt`: featureCounts biotype-level quantification results for each sample.
-  - `*.featureCounts.txt.summary`: featureCounts summary file containing overall statistics about the counts.
-  - `*_mqc.tsv`: MultiQC custom content files used to plot biotypes in report.
-
-</details>
-
-[featureCounts](http://bioinf.wehi.edu.au/featureCounts/) from the [Subread](http://subread.sourceforge.net/) package is a quantification tool used to summarise the mapped read distribution over genomic features such as genes, exons, promotors, gene bodies, genomic bins and chromosomal locations. We can also use featureCounts to count overlaps with different classes of genomic features. This provides an additional QC to check which features are most abundant in the sample, and to highlight potential problems such as rRNA contamination.
-
-![MultiQC - featureCounts biotypes plot](images/mqc_featurecounts_biotype.png)
 
 ### DESeq2
 
