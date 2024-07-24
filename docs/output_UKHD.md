@@ -264,7 +264,7 @@ $ samtools idxstats --threads 0 ${SAMPLE}.sorted.bam > ${SAMPLE}.sorted.bam.idxs
 <details markdown="1">
 <summary>Output files</summary>
 
-- `<ALIGNER>/`
+- `star_salmon/`
   - `${SAMPLE}.sorted.bam`: If `--save_align_intermeds` is specified the original coordinate sorted BAM file, which are necessary for many downstream analyses, such as variant calling, visualization in genome browsers, and various statistical analyses.
   - `${SAMPLE}.sorted.bam.bai`: If `--save_align_intermeds` is specified the BAI index file, which enables efficient querying and retrieval of data from the BAM file, which is especially useful for visualization tools like IGV (Integrative Genomics Viewer) and for quickly accessing specific genomic regions.
   - `${SAMPLE}.sorted.bam.csi`: If `--save_align_intermeds --bam_csi_index` is specified the CSI index file, which provides additional indexing capabilities for large datasets, allowing for efficient access to specific regions in very large BAM files.
