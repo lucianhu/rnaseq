@@ -608,15 +608,15 @@ $ dupradar.r \\
 <details markdown="1">
 <summary>Output files</summary>
 
-- `<ALIGNER>/dupradar/box_plot/`
+- `star_salmon/dupradar/box_plot/`
   - `*_duprateExpBoxplot.pdf`: PDF file containing box plot for duplicate rate relative to mean expression.
-- `<ALIGNER>/dupradar/gene_data/`
+- `star_salmon/dupradar/gene_data/`
   - `*_dupMatrix.txt`: Text file containing duplicate metrics per gene.
-- `<ALIGNER>/dupradar/histogram/`
+- `star_salmon/dupradar/histogram/`
   - `*_expressionHist.pdf`: PDF file containing histogram of reads per kilobase values per gene.
-- `<ALIGNER>/dupradar/intercepts_slope/`
+- `star_salmon/dupradar/intercepts_slope/`
   - `*_intercept_slope.txt`: Text file containing intercept slope values.
-- `<ALIGNER>/dupradar/scatter_plot/`
+- `star_salmon/dupradar/scatter_plot/`
   - `*_duprateExpDens.pdf`: PDF file containing typical dupRadar 2D density scatter plot.
 
 See [dupRadar docs](https://www.bioconductor.org/packages/devel/bioc/vignettes/dupRadar/inst/doc/dupRadar.html) for further information regarding the content of these files.
