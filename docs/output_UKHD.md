@@ -599,7 +599,7 @@ RSeQC documentation: [infer_experiment.py](http://rseqc.sourceforge.net/#infer-e
 Junction annotation compares detected splice junctions to a reference gene model. Splicing annotation is performed in two levels: splice event level and splice junction level.
 
 ```bash
-junction_annotation.py \
+$ junction_annotation.py \
     -i ${SAMPLE}.markdup.sorted.bam \
     -r genome.bed \
     -o ${SAMPLE} \
