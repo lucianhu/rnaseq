@@ -401,6 +401,41 @@ The [bigWig](https://genome.ucsc.edu/goldenpath/help/bigWig.html) format is an i
 
 ## Quality control
 
+### dupRadar
+
+[dupRadar](https://www.bioconductor.org/packages/release/bioc/html/dupRadar.html) is a Bioconductor library written in the R programming language. It generates various QC metrics and plots that relate duplication rate with gene expression levels in order to identify experiments with high technical duplication. A good sample with little technical duplication will only show high numbers of duplicates for highly expressed genes. Samples with technical duplication will have high duplication for all genes, irrespective of transcription level.
+
+```bash
+$ dupradar.r \\
+        ${SAMPLE}.markdup.sorted.bam \\
+        ${SAMPLE} \\
+        $ genome.gtf \\
+        $ strandedness \\
+        paired \\
+```
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `star_salmon/dupradar/box_plot/`
+  - `${SAMPLE}_duprateExpBoxplot.pdf`: PDF file containing box plot for duplicate rate relative to mean expression.
+- `star_salmon/dupradar/gene_data/`
+  - `${SAMPLE}_dupMatrix.txt`: Text file containing duplicate metrics per gene.
+- `star_salmon/dupradar/histogram/`
+  - `${SAMPLE}_expressionHist.pdf`: PDF file containing histogram of reads per kilobase values per gene.
+- `star_salmon/dupradar/intercepts_slope/`
+  - `${SAMPLE}_intercept_slope.txt`: Text file containing intercept slope values.
+- `star_salmon/dupradar/scatter_plot/`
+  - `${SAMPLE}_duprateExpDens.pdf`: PDF file containing typical dupRadar 2D density scatter plot.
+
+See [dupRadar docs](https://www.bioconductor.org/packages/devel/bioc/vignettes/dupRadar/inst/doc/dupRadar.html) for further information regarding the content of these files.
+
+</details>
+
+![dupRadar - Example good and bad experiment plot](images/dupradar_example_plot.png)
+
+> _Credit: [dupRadar documentation](https://www.bioconductor.org/packages/devel/bioc/vignettes/dupRadar/inst/doc/dupRadar.html)_
+
 ### RSeQC
 
 [RSeQC](<(http://rseqc.sourceforge.net/)>) is a package of scripts designed to evaluate the quality of RNA-seq data. This pipeline runs several, but not all RSeQC scripts. You can tweak the supported scripts you would like to run by adjusting the `--rseqc_modules` parameter which by default will run all of the following: `bam_stat.py`, `inner_distance.py`, `infer_experiment.py`, `junction_annotation.py`, `junction_saturation.py`,`read_distribution.py` and `read_duplication.py`.
@@ -590,41 +625,6 @@ The [Qualimap RNA-seq QC module](http://qualimap.bioinfo.cipf.es/doc_html/analys
 ![MultiQC - Qualimap gene coverage plot](images/mqc_qualimap_coverage.png)
 
 ![MultiQC - Qualimap genomic origin plot](images/mqc_qualimap_features.png)
-
-### dupRadar
-
-[dupRadar](https://www.bioconductor.org/packages/release/bioc/html/dupRadar.html) is a Bioconductor library written in the R programming language. It generates various QC metrics and plots that relate duplication rate with gene expression levels in order to identify experiments with high technical duplication. A good sample with little technical duplication will only show high numbers of duplicates for highly expressed genes. Samples with technical duplication will have high duplication for all genes, irrespective of transcription level.
-
-```bash
-$ dupradar.r \\
-        ${SAMPLE}.markdup.sorted.bam \\
-        ${SAMPLE} \\
-        $ genome.gtf \\
-        $ strandedness \\
-        paired \\
-```
-
-<details markdown="1">
-<summary>Output files</summary>
-
-- `star_salmon/dupradar/box_plot/`
-  - `${SAMPLE}_duprateExpBoxplot.pdf`: PDF file containing box plot for duplicate rate relative to mean expression.
-- `star_salmon/dupradar/gene_data/`
-  - `${SAMPLE}_dupMatrix.txt`: Text file containing duplicate metrics per gene.
-- `star_salmon/dupradar/histogram/`
-  - `${SAMPLE}_expressionHist.pdf`: PDF file containing histogram of reads per kilobase values per gene.
-- `star_salmon/dupradar/intercepts_slope/`
-  - `${SAMPLE}_intercept_slope.txt`: Text file containing intercept slope values.
-- `star_salmon/dupradar/scatter_plot/`
-  - `${SAMPLE}_duprateExpDens.pdf`: PDF file containing typical dupRadar 2D density scatter plot.
-
-See [dupRadar docs](https://www.bioconductor.org/packages/devel/bioc/vignettes/dupRadar/inst/doc/dupRadar.html) for further information regarding the content of these files.
-
-</details>
-
-![dupRadar - Example good and bad experiment plot](images/dupradar_example_plot.png)
-
-> _Credit: [dupRadar documentation](https://www.bioconductor.org/packages/devel/bioc/vignettes/dupRadar/inst/doc/dupRadar.html)_
 
 ### Preseq
 
