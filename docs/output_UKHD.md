@@ -389,6 +389,57 @@ $ mqc_features_stat.py \
 
 The [bigWig](https://genome.ucsc.edu/goldenpath/help/bigWig.html) format is an indexed binary format useful for displaying dense, continuous data in Genome Browsers such as the [UCSC](https://genome.ucsc.edu/cgi-bin/hgTracks) and [IGV](http://software.broadinstitute.org/software/igv/). This mitigates the need to load the much larger BAM files for data visualisation purposes which will be slower and result in memory issues. The bigWig format is also supported by various bioinformatics software for downstream processing such as meta-profile plotting.
 
+```
+# Generate bedGraph files for + (forward) and - (reverse) strands from BAM file
+# The `genomecov` command from bedtools calculates genome-wide coverage statistics
+
+# For the + strand (forward reads)
+bedtools \
+    genomecov \
+    -ibam ${SAMPLE}.markdup.sorted.bam \  # Input BAM file with duplicates marked and sorted
+    -bg \  # Output in bedGraph format
+    -strand + \  # Analyze coverage on the positive strand
+    -split \  # Consider spliced reads
+    -du \  # Report unique coverage
+    | bedtools sort > ${SAMPLE}.reverse.bedGraph  # Sort bedGraph output and save to file
+
+# For the - strand (reverse reads)
+bedtools \
+    genomecov \
+    -ibam ${SAMPLE}.markdup.sorted.bam \  # Input BAM file with duplicates marked and sorted
+    -bg \  # Output in bedGraph format
+    -strand - \  # Analyze coverage on the negative strand
+    -split \  # Consider spliced reads
+    -du \  # Report unique coverage
+    | bedtools sort > ${SAMPLE}.forward.bedGraph  # Sort bedGraph output and save to file
+
+# Clip bedGraph files to fit the reference genome size
+# `bedClip` adjusts the coordinates of the bedGraph files according to the sizes of the reference genome
+
+bedClip \
+    ${SAMPLE}_III.forward.bedGraph \  # Input bedGraph file for the forward strand
+    genome.fa.sizes \  # Reference genome sizes file
+    ${SAMPLE}.clip.forward.bedGraph  # Output clipped bedGraph file for the forward strand
+
+bedClip \
+    ${SAMPLE}.reverse.bedGraph \  # Input bedGraph file for the reverse strand
+    genome.fa.sizes \  # Reference genome sizes file
+    ${SAMPLE}.clip.reverse.bedGraph  # Output clipped bedGraph file for the reverse strand
+
+# Convert clipped bedGraph files to BigWig format for visualization
+# `bedGraphToBigWig` converts bedGraph format to BigWig format, which is suitable for genome browsers
+
+bedGraphToBigWig \
+    ${SAMPLE}.clip.forward.bedGraph \  # Input clipped bedGraph file for the forward strand
+    genome.fa.sizes \  # Reference genome sizes file
+    ${SAMPLE}.forward.bigWig  # Output BigWig file for the forward strand
+
+bedGraphToBigWig \
+    ${SAMPLE}.clip.reverse.bedGraph \  # Input clipped bedGraph file for the reverse strand
+    ${SAMPLE}.genome.fa.sizes \  # Reference genome sizes file
+    ${SAMPLE}.reverse.bigWig  # Output BigWig file for the reverse strand
+```
+
 <details markdown="1">
 <summary>Output files</summary>
 
@@ -656,6 +707,17 @@ RSeQC documentation: [read_duplication.py](http://rseqc.sourceforge.net/#read-du
 
 ### Qualimap
 
+```bash
+$ qualimap \
+    --java-mem-size=29491M \
+    rnaseq \
+     \
+    -bam ${SAMPLE}.markdup.sorted.bam \
+    -gtf genome.gtf \
+    -p $strandedness \
+    -pe \
+    -outdir ${SAMPLE}
+```
 <details markdown="1">
 <summary>Output files</summary>
 
@@ -679,23 +741,20 @@ The [Qualimap RNA-seq QC module](http://qualimap.bioinfo.cipf.es/doc_html/analys
 
 ![MultiQC - Qualimap genomic origin plot](images/mqc_qualimap_features.png)
 
-### Preseq
-
-<details markdown="1">
-<summary>Output files</summary>
-
-- `star_salmon/preseq/`
-  - `${SAMPLE}.lc_extrap.txt`: Preseq expected future yield file.
-- `star_salmon/preseq/log/`
-  - `${SAMPLE}.command.log`: Standard error output from command.
-
-</details>
-
-The [Preseq](http://smithlabresearch.org/software/preseq/) package is aimed at predicting and estimating the complexity of a genomic sequencing library, equivalent to predicting and estimating the number of redundant reads from a given sequencing depth and how many will be expected from additional sequencing using an initial sequencing experiment. The estimates can then be used to examine the utility of further sequencing, optimize the sequencing depth, or to screen multiple libraries to avoid low complexity samples. A shallow curve indicates that the library has reached complexity saturation and further sequencing would likely not add further unique reads. The dashed line shows a perfectly complex library where total reads = unique reads. Note that these are predictive numbers only, not absolute. The MultiQC plot can sometimes give extreme sequencing depth on the X axis - click and drag from the left side of the plot to zoom in on more realistic numbers.
-
 ![MultiQC - Preseq library complexity plot](images/mqc_preseq_plot.png)
 
 ### MultiQC
+
+```bash
+$ multiqc \
+    -n multiqc_report.html \
+    -f \
+     \
+     \
+    .
+```
+
+Results generated by MultiQC collate pipeline QC from supported tools i.e. FastQC, Cutadapt, SortMeRNA, STAR, RSEM, HISAT2, Salmon, SAMtools, Picard, RSeQC, Qualimap, and featureCounts. Additionally, various custom content has been added to the report to assess the output of dupRadar, and featureCounts biotypes, and to highlight samples failing a mimimum mapping threshold or those that failed to match the strand-specificity provided in the input samplesheet. The pipeline has special steps which also allow the software versions to be reported in the MultiQC output for future traceability. For more information about how to use MultiQC reports, see <http://multiqc.info>.
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -708,27 +767,7 @@ The [Preseq](http://smithlabresearch.org/software/preseq/) package is aimed at p
 
 [MultiQC](http://multiqc.info) is a visualization tool that generates a single HTML report summarising all samples in your project. Most of the pipeline QC results are visualised in the report and further statistics are available in the report data directory.
 
-Results generated by MultiQC collate pipeline QC from supported tools i.e. FastQC, Cutadapt, SortMeRNA, STAR, RSEM, HISAT2, Salmon, SAMtools, Picard, RSeQC, Qualimap, Preseq and featureCounts. Additionally, various custom content has been added to the report to assess the output of dupRadar, DESeq2 and featureCounts biotypes, and to highlight samples failing a mimimum mapping threshold or those that failed to match the strand-specificity provided in the input samplesheet. The pipeline has special steps which also allow the software versions to be reported in the MultiQC output for future traceability. For more information about how to use MultiQC reports, see <http://multiqc.info>.
-
 ## Workflow reporting and genomes
-
-### Reference genome files
-
-<details markdown="1">
-<summary>Output files</summary>
-
-- `genome/`
-  - `*.fa`, `*.gtf`, `*.gff`, `*.bed`, `.tsv`: If the `--save_reference` parameter is provided then all of the genome reference files will be placed in this directory.
-- `genome/index/`
-  - `star/`: Directory containing STAR indices.
-  - `hisat2/`: Directory containing HISAT2 indices.
-  - `rsem/`: Directory containing STAR and RSEM indices.
-  - `salmon/`: Directory containing Salmon indices.
-  - `kallisto/`: Directory containing Kallisto indices.
-
-</details>
-
-A number of genome-specific files are generated by the pipeline because they are required for the downstream processing of the results. If the `--save_reference` parameter is provided then these will be saved in the `genome/` directory. It is recommended to use the `--save_reference` parameter if you are using the pipeline to build new indices so that you can save them somewhere locally. The index building step can be quite a time-consuming process and it permits their reuse for future runs of the pipeline to save disk space.
 
 ### Pipeline information
 
