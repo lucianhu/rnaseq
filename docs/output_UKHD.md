@@ -406,12 +406,12 @@ The [bigWig](https://genome.ucsc.edu/goldenpath/help/bigWig.html) format is an i
 [dupRadar](https://www.bioconductor.org/packages/release/bioc/html/dupRadar.html) is a Bioconductor library written in the R programming language. It generates various QC metrics and plots that relate duplication rate with gene expression levels in order to identify experiments with high technical duplication. A good sample with little technical duplication will only show high numbers of duplicates for highly expressed genes. Samples with technical duplication will have high duplication for all genes, irrespective of transcription level.
 
 ```bash
-$ dupradar.r \\
-        ${SAMPLE}.markdup.sorted.bam \\
-        ${SAMPLE} \\
-        $ genome.gtf \\
-        $ strandedness \\
-        paired \\
+$ dupradar.r \
+        ${SAMPLE}.markdup.sorted.bam \
+        ${SAMPLE} \
+        $ genome.gtf \
+        $ strandedness \
+        paired \
 ```
 
 <details markdown="1">
@@ -444,6 +444,16 @@ The majority of RSeQC scripts generate output files which can be plotted and sum
 
 #### Infer experiment
 
+This script predicts the "strandedness" of the protocol (i.e. unstranded, sense or antisense) that was used to prepare the sample for sequencing by assessing the orientation in which aligned reads overlay gene features in the reference genome. The strandedness of each sample has to be provided to the pipeline in the input samplesheet (see [usage docs](https://nf-co.re/rnaseq/usage#samplesheet-input)). However, this information is not always available, especially for public datasets. As a result, additional features have been incorporated into this pipeline to auto-detect whether you have provided the correct information in the samplesheet, and if this is not the case then a warning table will be placed at the top of the MultiQC report highlighting the offending samples (see image below). If required, this will allow you to correct the input samplesheet and rerun the pipeline with the accurate strand information. Note, it is important to get this information right because it can affect the final results.
+
+```bash
+infer_experiment.py \
+    -i ${SAMPLE}.markdup.sorted.bam \
+    -r genome.bed \
+     \
+    > ${SAMPLE}.infer_experiment.txt
+```
+
 <details markdown="1">
 <summary>Output files</summary>
 
@@ -451,8 +461,6 @@ The majority of RSeQC scripts generate output files which can be plotted and sum
   - `*.infer_experiment.txt`: File containing fraction of reads mapping to given strandedness configurations.
 
 </details>
-
-This script predicts the "strandedness" of the protocol (i.e. unstranded, sense or antisense) that was used to prepare the sample for sequencing by assessing the orientation in which aligned reads overlay gene features in the reference genome. The strandedness of each sample has to be provided to the pipeline in the input samplesheet (see [usage docs](https://nf-co.re/rnaseq/usage#samplesheet-input)). However, this information is not always available, especially for public datasets. As a result, additional features have been incorporated into this pipeline to auto-detect whether you have provided the correct information in the samplesheet, and if this is not the case then a warning table will be placed at the top of the MultiQC report highlighting the offending samples (see image below). If required, this will allow you to correct the input samplesheet and rerun the pipeline with the accurate strand information. Note, it is important to get this information right because it can affect the final results.
 
 RSeQC documentation: [infer_experiment.py](http://rseqc.sourceforge.net/#infer-experiment-py)
 
