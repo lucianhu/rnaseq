@@ -38,7 +38,6 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
   - [Qualimap](#qualimap) - Various RNA-seq QC metrics
   - [MultiQC](#multiqc) - Present QC for raw reads, alignment, read counting and sample similiarity
 - [Workflow reporting and genomes](#workflow-reporting-and-genomes)
-  - [Reference genome files](#reference-genome-files) - Saving reference genome indices/files
   - [Pipeline information](#pipeline-information) - Report metrics generated during the workflow execution
 
 ## Preprocessing
@@ -394,7 +393,7 @@ The [bigWig](https://genome.ucsc.edu/goldenpath/help/bigWig.html) format is an i
 # The `genomecov` command from bedtools calculates genome-wide coverage statistics
 
 # For the + strand (forward reads)
-bedtools \
+$ bedtools \
     genomecov \
     -ibam ${SAMPLE}.markdup.sorted.bam \  # Input BAM file with duplicates marked and sorted
     -bg \  # Output in bedGraph format
@@ -404,7 +403,7 @@ bedtools \
     | bedtools sort > ${SAMPLE}.reverse.bedGraph  # Sort bedGraph output and save to file
 
 # For the - strand (reverse reads)
-bedtools \
+$ bedtools \
     genomecov \
     -ibam ${SAMPLE}.markdup.sorted.bam \  # Input BAM file with duplicates marked and sorted
     -bg \  # Output in bedGraph format
@@ -416,12 +415,12 @@ bedtools \
 # Clip bedGraph files to fit the reference genome size
 # `bedClip` adjusts the coordinates of the bedGraph files according to the sizes of the reference genome
 
-bedClip \
+$ bedClip \
     ${SAMPLE}_III.forward.bedGraph \  # Input bedGraph file for the forward strand
     genome.fa.sizes \  # Reference genome sizes file
     ${SAMPLE}.clip.forward.bedGraph  # Output clipped bedGraph file for the forward strand
 
-bedClip \
+$ bedClip \
     ${SAMPLE}.reverse.bedGraph \  # Input bedGraph file for the reverse strand
     genome.fa.sizes \  # Reference genome sizes file
     ${SAMPLE}.clip.reverse.bedGraph  # Output clipped bedGraph file for the reverse strand
@@ -429,12 +428,12 @@ bedClip \
 # Convert clipped bedGraph files to BigWig format for visualization
 # `bedGraphToBigWig` converts bedGraph format to BigWig format, which is suitable for genome browsers
 
-bedGraphToBigWig \
+$ bedGraphToBigWig \
     ${SAMPLE}.clip.forward.bedGraph \  # Input clipped bedGraph file for the forward strand
     genome.fa.sizes \  # Reference genome sizes file
     ${SAMPLE}.forward.bigWig  # Output BigWig file for the forward strand
 
-bedGraphToBigWig \
+$ bedGraphToBigWig \
     ${SAMPLE}.clip.reverse.bedGraph \  # Input clipped bedGraph file for the reverse strand
     ${SAMPLE}.genome.fa.sizes \  # Reference genome sizes file
     ${SAMPLE}.reverse.bigWig  # Output BigWig file for the reverse strand
