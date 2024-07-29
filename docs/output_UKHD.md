@@ -33,10 +33,9 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
   - [featureCounts](#featurecounts) - Read counting relative to gene biotype
   - [BEDTools and bedGraphToBigWig](#bedtools-and-bedgraphtobigwig) - Create bigWig coverage files
 - [Quality control](#quality-control)
+  - [dupRadar](#dupradar) - Assessment of technical / biological read duplication
   - [RSeQC](#rseqc) - Various RNA-seq QC metrics
   - [Qualimap](#qualimap) - Various RNA-seq QC metrics
-  - [dupRadar](#dupradar) - Assessment of technical / biological read duplication
-  - [DESeq2](#deseq2) - PCA plot and sample pairwise distance heatmap and dendrogram
   - [MultiQC](#multiqc) - Present QC for raw reads, alignment, read counting and sample similiarity
 - [Workflow reporting and genomes](#workflow-reporting-and-genomes)
   - [Reference genome files](#reference-genome-files) - Saving reference genome indices/files
