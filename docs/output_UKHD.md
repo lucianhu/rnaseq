@@ -593,6 +593,18 @@ The [Qualimap RNA-seq QC module](http://qualimap.bioinfo.cipf.es/doc_html/analys
 
 ### dupRadar
 
+[dupRadar](https://www.bioconductor.org/packages/release/bioc/html/dupRadar.html) is a Bioconductor library written in the R programming language. It generates various QC metrics and plots that relate duplication rate with gene expression levels in order to identify experiments with high technical duplication. A good sample with little technical duplication will only show high numbers of duplicates for highly expressed genes. Samples with technical duplication will have high duplication for all genes, irrespective of transcription level.
+
+```bash
+$ dupradar.r \\
+        ${SAMPLE}.markdup.sorted.bam \\
+        ${SAMPLE} \\
+        $ genome.gtf \\
+        $ strandedness \\
+        paired \\
+        $task.cpus
+```
+
 <details markdown="1">
 <summary>Output files</summary>
 
@@ -610,8 +622,6 @@ The [Qualimap RNA-seq QC module](http://qualimap.bioinfo.cipf.es/doc_html/analys
 See [dupRadar docs](https://www.bioconductor.org/packages/devel/bioc/vignettes/dupRadar/inst/doc/dupRadar.html) for further information regarding the content of these files.
 
 </details>
-
-[dupRadar](https://www.bioconductor.org/packages/release/bioc/html/dupRadar.html) is a Bioconductor library written in the R programming language. It generates various QC metrics and plots that relate duplication rate with gene expression levels in order to identify experiments with high technical duplication. A good sample with little technical duplication will only show high numbers of duplicates for highly expressed genes. Samples with technical duplication will have high duplication for all genes, irrespective of transcription level.
 
 ![dupRadar - Example good and bad experiment plot](images/dupradar_example_plot.png)
 
