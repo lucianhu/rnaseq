@@ -602,22 +602,21 @@ $ dupradar.r \\
         $ genome.gtf \\
         $ strandedness \\
         paired \\
-        $task.cpus
 ```
 
 <details markdown="1">
 <summary>Output files</summary>
 
 - `star_salmon/dupradar/box_plot/`
-  - `*_duprateExpBoxplot.pdf`: PDF file containing box plot for duplicate rate relative to mean expression.
+  - `${SAMPLE}_duprateExpBoxplot.pdf`: PDF file containing box plot for duplicate rate relative to mean expression.
 - `star_salmon/dupradar/gene_data/`
-  - `*_dupMatrix.txt`: Text file containing duplicate metrics per gene.
+  - `${SAMPLE}_dupMatrix.txt`: Text file containing duplicate metrics per gene.
 - `star_salmon/dupradar/histogram/`
-  - `*_expressionHist.pdf`: PDF file containing histogram of reads per kilobase values per gene.
+  - `${SAMPLE}_expressionHist.pdf`: PDF file containing histogram of reads per kilobase values per gene.
 - `star_salmon/dupradar/intercepts_slope/`
-  - `*_intercept_slope.txt`: Text file containing intercept slope values.
+  - `${SAMPLE}_intercept_slope.txt`: Text file containing intercept slope values.
 - `star_salmon/dupradar/scatter_plot/`
-  - `*_duprateExpDens.pdf`: PDF file containing typical dupRadar 2D density scatter plot.
+  - `${SAMPLE}_duprateExpDens.pdf`: PDF file containing typical dupRadar 2D density scatter plot.
 
 See [dupRadar docs](https://www.bioconductor.org/packages/devel/bioc/vignettes/dupRadar/inst/doc/dupRadar.html) for further information regarding the content of these files.
 
