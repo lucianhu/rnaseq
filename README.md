@@ -16,24 +16,33 @@
 **nf-core/rnaseq** is a bioinformatics pipeline that can be used to analyse RNA sequencing data obtained from organisms with a reference genome and annotation. It takes a samplesheet and FASTQ files as input, performs quality control (QC), trimming and (pseudo-)alignment, and produces a gene expression matrix and extensive QC report.
 
 ![nf-core/rnaseq UKHD_metro map](docs/images/RNAseq.UKHD.png)
+## RNA-seq Data Analysis Workflow
 
-1. Merge re-sequenced FastQ files ([`cat`](http://www.linfo.org/cat.html))
-2. Sub-sample FastQ files and auto-infer strandedness ([`fq`](https://github.com/stjude-rust-labs/fq), [`Salmon`](https://combine-lab.github.io/salmon/))
-3. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
-4. Adapter and quality trimming ([`Trim Galore!`](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/))
-5. Alignment and quantification routes [`STAR`](https://github.com/alexdobin/STAR) -> [`Salmon`](https://combine-lab.github.io/salmon/)
-6. Sort and index alignments ([`SAMtools`](https://sourceforge.net/projects/samtools/files/samtools/))
-11. Duplicate read marking ([`picard MarkDuplicates`](https://broadinstitute.github.io/picard/))
-12. Transcript assembly and quantification ([`StringTie`](https://ccb.jhu.edu/software/stringtie/))
-13. Create bigWig coverage files ([`BEDTools`](https://github.com/arq5x/bedtools2/), [`bedGraphToBigWig`](http://hgdownload.soe.ucsc.edu/admin/exe/))
-14. Extensive quality control:
-    1. [`RSeQC`](http://rseqc.sourceforge.net/)
-    2. [`Qualimap`](http://qualimap.bioinfo.cipf.es/)
-    3. [`dupRadar`](https://bioconductor.org/packages/release/bioc/html/dupRadar.html)
-    4. [`Preseq`](http://smithlabresearch.org/software/preseq/)
-    5. [`DESeq2`](https://bioconductor.org/packages/release/bioc/html/DESeq2.html)
-15. Pseudoalignment and quantification ([`Salmon`](https://combine-lab.github.io/salmon/) or ['Kallisto'](https://pachterlab.github.io/kallisto/); _optional_)
-16. Present QC for raw read, alignment, gene biotype, sample similarity, and strand-specificity checks ([`MultiQC`](http://multiqc.info/), [`R`](https://www.r-project.org/))
+1. **Prepare Reference Files**: Obtain the reference genome, annotation file, and bed file.
+
+2. **Sub-sample FastQ Files and Infer Strandedness**: Use [`fq`](https://github.com/stjude-rust-labs/fq) and [`Salmon`](https://combine-lab.github.io/salmon/) to sub-sample FastQ files and auto-infer strandedness.
+
+3. **Read Quality Control (QC)**: Assess read quality with [`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/).
+
+4. **Adapter and Quality Trimming**: Trim adapters, low-quality bases, and polyA tails using [`Trim Galore!`] https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/).
+
+5. **Alignment and Quantification**
+   - Perform alignment with [`STAR`](https://github.com/alexdobin/STAR).
+   - Quantify transcripts with [`Salmon`](https://combine-lab.github.io/salmon/).
+
+6. **Sort and Index Alignments**: Use [`SAMtools`](https://sourceforge.net/projects/samtools/files/samtools/) to sort and index alignment files.
+
+7. **Duplicate Read Marking**: Mark duplicate reads (do not remove) with [`picard MarkDuplicates`](https://broadinstitute.github.io/picard/).
+
+8. **Transcript Assembly and Quantification**: Assemble transcripts and perform quantification using [`StringTie`](https://ccb.jhu.edu/software/stringtie/).
+
+9. **Create BigWig Coverage Files**: Create `BigWig` files for IGV to visualize coverage tracks and analyze read distribution and genomic features using [`BEDTools`](https://github.com/arq5x/bedtools2/) and [`bedGraphToBigWig`](http://hgdownload.soe.ucsc.edu/admin/exe/).
+
+10. **Extensive Quality Control**
+    - **Technical/Biological Read Duplication**: Assess with [`dupRadar`](https://bioconductor.org/packages/release/bioc/html/dupRadar.html).
+    - **Various RNA-seq QC Metrics**: Evaluate using [`Qualimap`](http://qualimap.bioinfo.cipf.es/) and [`RSeQC`](http://rseqc.sourceforge.net/).
+
+11. **Present QC Results**: Present quality control metrics for raw reads, alignment, gene biotype, sample similarity, and strand-specificity using [`MultiQC`](http://multiqc.info/) and [`R`](https://www.r-project.org/).
 
 > **Note**
 > The SRA download functionality has been removed from the pipeline (`>=3.2`) and ported to an independent workflow called [nf-core/fetchngs](https://nf-co.re/fetchngs). You can provide `--nf_core_pipeline rnaseq` when running nf-core/fetchngs to download and auto-create a samplesheet containing publicly available samples that can be accepted directly as input by this pipeline.
