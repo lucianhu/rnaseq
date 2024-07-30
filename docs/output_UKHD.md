@@ -34,8 +34,8 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
   - [BEDTools and bedGraphToBigWig](#bedtools-and-bedgraphtobigwig) - Create bigWig coverage files
 - [Quality control](#quality-control)
   - [dupRadar](#dupradar) - Assessment of technical / biological read duplication
-  - [RSeQC](#rseqc) - Various RNA-seq QC metrics
   - [Qualimap](#qualimap) - Various RNA-seq QC metrics
+  - [RSeQC](#rseqc) - Various RNA-seq QC metrics
   - [MultiQC](#multiqc) - Present QC for raw reads, alignment, read counting and sample similiarity
 - [Workflow reporting and genomes](#workflow-reporting-and-genomes)
   - [Pipeline information](#pipeline-information) - Report metrics generated during the workflow execution
@@ -575,6 +575,57 @@ See [dupRadar docs](https://www.bioconductor.org/packages/devel/bioc/vignettes/d
 
 > _Credit: [dupRadar documentation](https://www.bioconductor.org/packages/devel/bioc/vignettes/dupRadar/inst/doc/dupRadar.html)_
 
+### Qualimap
+
+```bash
+# Run the Qualimap tool to perform RNA-seq quality control and analysis on a BAM file
+
+$ qualimap \
+    # Set the maximum amount of Java heap memory available for Qualimap
+    --java-mem-size=29491M \
+    
+    # Specify the type of analysis: RNA-seq in this case
+    rnaseq \
+    
+    # Input BAM file for RNA-seq analysis
+    -bam ${SAMPLE}.markdup.sorted.bam \
+    
+    # Provide the GTF file with gene annotations
+    -gtf annotation.gtf \
+    
+    # Specify the strandedness of the RNA-seq library; this should be either 'unstranded', 'forward', or 'reverse'
+    -p $strandedness \
+    
+    # Indicate that paired-end reads are used in the analysis
+    -pe \
+    
+    # Specify the output directory where results will be saved
+    -outdir ${SAMPLE}
+```
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `star_salmon/qualimap/<SAMPLE>/`
+  - `qualimapReport.html`: Qualimap HTML report that can be viewed in a web browser.
+  - `rnaseq_qc_results.txt`: Textual results output.
+- `star_salmon/qualimap/<SAMPLE>/images_qualimapReport/`: Images required for the HTML report.
+- `star_salmon/qualimap/<SAMPLE>/raw_data_qualimapReport/`: Raw data required for the HTML report.
+- `star_salmon/qualimap/<SAMPLE>/css/`: CSS files required for the HTML report.
+
+</details>
+
+[Qualimap](http://qualimap.bioinfo.cipf.es/) is a platform-independent application written in Java and R that provides both a Graphical User Interface (GUI) and a command-line interface to facilitate the quality control of alignment sequencing data. Shortly, Qualimap:
+
+- Examines sequencing alignment data according to the features of the mapped reads and their genomic properties.
+- Provides an overall view of the data that helps to to the detect biases in the sequencing and/or mapping of the data and eases decision-making for further analysis.
+
+The [Qualimap RNA-seq QC module](http://qualimap.bioinfo.cipf.es/doc_html/analysis.html#rna-seq-qc) is used within this pipeline to assess the overall mapping and coverage relative to gene features.
+
+![MultiQC - Qualimap gene coverage plot](images/mqc_qualimap_coverage.png)
+
+![MultiQC - Qualimap genomic origin plot](images/mqc_qualimap_features.png)
+
 ### RSeQC
 
 [RSeQC](<(http://rseqc.sourceforge.net/)>) is a package of scripts designed to evaluate the quality of RNA-seq data. This pipeline runs several, but not all RSeQC scripts. You can tweak the supported scripts you would like to run by adjusting the `--rseqc_modules` parameter which by default will run all of the following: `bam_stat.py`, `inner_distance.py`, `infer_experiment.py`, `junction_annotation.py`, `junction_saturation.py`,`read_distribution.py` and `read_duplication.py`.
@@ -841,59 +892,6 @@ $ python read_duplication.py \
 RSeQC documentation: [read_duplication.py](http://rseqc.sourceforge.net/#read-duplication-py)
 
 ![MultiQC - RSeQC read duplication plot](images/mqc_rseqc_readduplication.png)
-
-### Qualimap
-
-```bash
-# Run the Qualimap tool to perform RNA-seq quality control and analysis on a BAM file
-
-$ qualimap \
-    # Set the maximum amount of Java heap memory available for Qualimap
-    --java-mem-size=29491M \
-    
-    # Specify the type of analysis: RNA-seq in this case
-    rnaseq \
-    
-    # Input BAM file for RNA-seq analysis
-    -bam ${SAMPLE}.markdup.sorted.bam \
-    
-    # Provide the GTF file with gene annotations
-    -gtf annotation.gtf \
-    
-    # Specify the strandedness of the RNA-seq library; this should be either 'unstranded', 'forward', or 'reverse'
-    -p $strandedness \
-    
-    # Indicate that paired-end reads are used in the analysis
-    -pe \
-    
-    # Specify the output directory where results will be saved
-    -outdir ${SAMPLE}
-```
-
-<details markdown="1">
-<summary>Output files</summary>
-
-- `star_salmon/qualimap/<SAMPLE>/`
-  - `qualimapReport.html`: Qualimap HTML report that can be viewed in a web browser.
-  - `rnaseq_qc_results.txt`: Textual results output.
-- `star_salmon/qualimap/<SAMPLE>/images_qualimapReport/`: Images required for the HTML report.
-- `star_salmon/qualimap/<SAMPLE>/raw_data_qualimapReport/`: Raw data required for the HTML report.
-- `star_salmon/qualimap/<SAMPLE>/css/`: CSS files required for the HTML report.
-
-</details>
-
-[Qualimap](http://qualimap.bioinfo.cipf.es/) is a platform-independent application written in Java and R that provides both a Graphical User Interface (GUI) and a command-line interface to facilitate the quality control of alignment sequencing data. Shortly, Qualimap:
-
-- Examines sequencing alignment data according to the features of the mapped reads and their genomic properties.
-- Provides an overall view of the data that helps to to the detect biases in the sequencing and/or mapping of the data and eases decision-making for further analysis.
-
-The [Qualimap RNA-seq QC module](http://qualimap.bioinfo.cipf.es/doc_html/analysis.html#rna-seq-qc) is used within this pipeline to assess the overall mapping and coverage relative to gene features.
-
-![MultiQC - Qualimap gene coverage plot](images/mqc_qualimap_coverage.png)
-
-![MultiQC - Qualimap genomic origin plot](images/mqc_qualimap_features.png)
-
-![MultiQC - Preseq library complexity plot](images/mqc_preseq_plot.png)
 
 ### MultiQC
 
