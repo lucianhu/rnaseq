@@ -741,8 +741,8 @@ workflow RNASEQ {
     //
     // MODULE: Downstream QC steps
     //
-    ch_qualimap_multiqc           = Channel.empty()
     ch_dupradar_multiqc           = Channel.empty()
+    ch_qualimap_multiqc           = Channel.empty()
     ch_bamstat_multiqc            = Channel.empty()
     ch_inferexperiment_multiqc    = Channel.empty()
     ch_innerdistance_multiqc      = Channel.empty()
@@ -753,15 +753,7 @@ workflow RNASEQ {
     ch_fail_strand_multiqc        = Channel.empty()
     ch_tin_multiqc                = Channel.empty()
     if (!params.skip_alignment && !params.skip_qc) {
-        if (!params.skip_qualimap) {
-            QUALIMAP_RNASEQ (
-                ch_genome_bam,
-                PREPARE_GENOME.out.gtf.map { [ [:], it ] }
-            )
-            ch_qualimap_multiqc = QUALIMAP_RNASEQ.out.results
-            ch_versions = ch_versions.mix(QUALIMAP_RNASEQ.out.versions.first())
-        }
-
+        
         if (!params.skip_dupradar) {
             DUPRADAR (
                 ch_genome_bam,
@@ -769,6 +761,15 @@ workflow RNASEQ {
             )
             ch_dupradar_multiqc = DUPRADAR.out.multiqc
             ch_versions = ch_versions.mix(DUPRADAR.out.versions.first())
+        }
+
+        if (!params.skip_qualimap) {
+            QUALIMAP_RNASEQ (
+                ch_genome_bam,
+                PREPARE_GENOME.out.gtf.map { [ [:], it ] }
+            )
+            ch_qualimap_multiqc = QUALIMAP_RNASEQ.out.results
+            ch_versions = ch_versions.mix(QUALIMAP_RNASEQ.out.versions.first())
         }
 
         if (!params.skip_rseqc && rseqc_modules.size() > 0) {
