@@ -13,11 +13,12 @@
 
 ## Introduction
 
-This repository is a customized version of `nf-core/rnaseq`, adapted with specific plugins for the UKHD environment. The pipeline includes essential default parameters and disables unnecessary features. For detailed information, refer to the full `nf-core/rnaseq` documentation [here](https://nf-co.re/rnaseq/3.14.0/). 
-
 **nf-core/rnaseq** is a bioinformatics pipeline that can be used to analyse RNA sequencing data obtained from organisms with a reference genome and annotation. It takes a samplesheet and FASTQ files as input, performs quality control (QC), trimming and (pseudo-)alignment, and produces a gene expression matrix and extensive QC report.
 
+This repository is a customized version of `nf-core/rnaseq v3.14.0`, adapted with specific plugins for the UKHD environment. The pipeline includes essential default parameters and disables unnecessary features. For detailed information, refer to the full `nf-core/rnaseq` documentation [here](https://nf-co.re/rnaseq/3.14.0/). 
+
 ![nf-core/rnaseq UKHD_metro map](docs/images/RNAseq.UKHD.png)
+
 ## RNA-seq Data Analysis Workflow
 
 1. **Prepare Reference Files**: Obtain the reference genome, annotation file, and bed file.
