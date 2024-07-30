@@ -15,21 +15,14 @@
 
 **nf-core/rnaseq** is a bioinformatics pipeline that can be used to analyse RNA sequencing data obtained from organisms with a reference genome and annotation. It takes a samplesheet and FASTQ files as input, performs quality control (QC), trimming and (pseudo-)alignment, and produces a gene expression matrix and extensive QC report.
 
-![nf-core/rnaseq metro map](docs/images/nf-core-rnaseq_metro_map_grey.png)
+![nf-core/rnaseq UKHD_metro map](docs/images/RNAseq.UKHD.png)
 
 1. Merge re-sequenced FastQ files ([`cat`](http://www.linfo.org/cat.html))
 2. Sub-sample FastQ files and auto-infer strandedness ([`fq`](https://github.com/stjude-rust-labs/fq), [`Salmon`](https://combine-lab.github.io/salmon/))
 3. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
-4. UMI extraction ([`UMI-tools`](https://github.com/CGATOxford/UMI-tools))
-5. Adapter and quality trimming ([`Trim Galore!`](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/))
-6. Removal of genome contaminants ([`BBSplit`](http://seqanswers.com/forums/showthread.php?t=41288))
-7. Removal of ribosomal RNA ([`SortMeRNA`](https://github.com/biocore/sortmerna))
-8. Choice of multiple alignment and quantification routes:
-   1. [`STAR`](https://github.com/alexdobin/STAR) -> [`Salmon`](https://combine-lab.github.io/salmon/)
-   2. [`STAR`](https://github.com/alexdobin/STAR) -> [`RSEM`](https://github.com/deweylab/RSEM)
-   3. [`HiSAT2`](https://ccb.jhu.edu/software/hisat2/index.shtml) -> **NO QUANTIFICATION**
-9. Sort and index alignments ([`SAMtools`](https://sourceforge.net/projects/samtools/files/samtools/))
-10. UMI-based deduplication ([`UMI-tools`](https://github.com/CGATOxford/UMI-tools))
+4. Adapter and quality trimming ([`Trim Galore!`](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/))
+5. Alignment and quantification routes [`STAR`](https://github.com/alexdobin/STAR) -> [`Salmon`](https://combine-lab.github.io/salmon/)
+6. Sort and index alignments ([`SAMtools`](https://sourceforge.net/projects/samtools/files/samtools/))
 11. Duplicate read marking ([`picard MarkDuplicates`](https://broadinstitute.github.io/picard/))
 12. Transcript assembly and quantification ([`StringTie`](https://ccb.jhu.edu/software/stringtie/))
 13. Create bigWig coverage files ([`BEDTools`](https://github.com/arq5x/bedtools2/), [`bedGraphToBigWig`](http://hgdownload.soe.ucsc.edu/admin/exe/))
