@@ -24,7 +24,7 @@
 
 3. **Read Quality Control (QC)**: Assess read quality with [`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/).
 
-4. **Adapter and Quality Trimming**: Trim adapters, low-quality bases, and polyA tails using [`Trim Galore!`] https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/).
+4. **Adapter and Quality Trimming**: Trim adapters, low-quality bases, and polyA tails using [`Trim Galore!`]https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/).
 
 5. **Alignment and Quantification**
    - Perform alignment with [`STAR`](https://github.com/alexdobin/STAR).
@@ -36,19 +36,13 @@
 
 8. **Transcript Assembly and Quantification**: Assemble transcripts and perform quantification using [`StringTie`](https://ccb.jhu.edu/software/stringtie/).
 
-9. **Create BigWig Coverage Files**: Create `BigWig` files for IGV to visualize coverage tracks and analyze read distribution and genomic features using [`BEDTools`](https://github.com/arq5x/bedtools2/) and [`bedGraphToBigWig`](http://hgdownload.soe.ucsc.edu/admin/exe/).
+9. **Create BigWig Coverage Files**: Create `bigWig` files for IGV to visualize coverage tracks and analyze read distribution and genomic features using [`BEDTools`](https://github.com/arq5x/bedtools2/) and [`bedGraphToBigWig`](http://hgdownload.soe.ucsc.edu/admin/exe/).
 
 10. **Extensive Quality Control**
     - **Technical/Biological Read Duplication**: Assess with [`dupRadar`](https://bioconductor.org/packages/release/bioc/html/dupRadar.html).
     - **Various RNA-seq QC Metrics**: Evaluate using [`Qualimap`](http://qualimap.bioinfo.cipf.es/) and [`RSeQC`](http://rseqc.sourceforge.net/).
 
 11. **Present QC Results**: Present quality control metrics for raw reads, alignment, gene biotype, sample similarity, and strand-specificity using [`MultiQC`](http://multiqc.info/) and [`R`](https://www.r-project.org/).
-
-> **Note**
-> The SRA download functionality has been removed from the pipeline (`>=3.2`) and ported to an independent workflow called [nf-core/fetchngs](https://nf-co.re/fetchngs). You can provide `--nf_core_pipeline rnaseq` when running nf-core/fetchngs to download and auto-create a samplesheet containing publicly available samples that can be accepted directly as input by this pipeline.
-
-> **Warning**
-> Quantification isn't performed if using `--aligner hisat2` due to the lack of an appropriate option to calculate accurate expression estimates from HISAT2 derived genomic alignments. However, you can use this route if you have a preference for the alignment, QC and other types of downstream analysis compatible with the output of HISAT2.
 
 ## Installation
 First, install Nextflow using Conda and set up the required plugins and environment variables.
