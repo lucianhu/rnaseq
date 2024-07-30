@@ -107,6 +107,8 @@ outdir: '/path/to/output_dir'
 fasta: '/path/to/references/genome.fa'
 gtf: '/path/to/references/annotation.gtf'
 star_index: '/path/to/genome/star_index_dir'
+save_trimmed: true
+save_align_intermeds: true
 ```
 
 > [!WARNING]
@@ -138,11 +140,9 @@ For more details and further functionality, please refer to the [usage documenta
 
 ## Pipeline output
 
-To see the results of an example test run with a full size dataset refer to the [results](https://nf-co.re/rnaseq/results) tab on the nf-core website pipeline page.
-For more details about the output files and reports, please refer to the
-[output documentation](https://nf-co.re/rnaseq/output).
+For a summary of the results and a brief explanation of the tools used in the UKHD system, please visit: [UKHD Output Documentation](https://github.com/lucianhu/rnaseq_nextflow/blob/master/docs/output_UKHD.md). For detailed outputs and reports with full parameters, refer to the [nf-core output documentation](https://nf-co.re/rnaseq/output).
 
-This pipeline quantifies RNA-sequenced reads relative to genes/transcripts in the genome and normalizes the resulting data. It does not compare the samples statistically in order to assign significance in the form of FDR or P-values. For downstream analyses, the output files from this pipeline can be analysed directly in statistical environments like [R](https://www.r-project.org/), [Julia](https://julialang.org/) or via the [nf-core/differentialabundance](https://github.com/nf-core/differentialabundance/) pipeline.
+This pipeline quantifies RNA-sequenced reads against genes/transcripts in the genome and normalizes the data. However, it does not perform statistical comparisons to determine significance using FDR or P-values. For further analysis, you can examine the output files in statistical environments such as R or Julia, or use the [nf-core/differentialabundance](https://nf-co.re/differentialabundance) pipeline.
 
 ## Online videos
 
