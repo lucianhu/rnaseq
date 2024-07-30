@@ -49,6 +49,10 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 > **NB:** The FastQC plots in this directory are generated relative to the raw, input reads. They may contain adapter sequence and regions of low quality. To see how your reads look after adapter and quality trimming please refer to the FastQC reports in the `trimgalore/fastqc/` directory.
 
 ```bash
+# Run FastQC on the paired-end FASTQ files for quality control
+# --quiet suppresses output messages other than errors and warnings
+# --threads 6 specifies the number of threads to use for processing
+
 $ fastqc --quiet --threads 6 ${SAMPLE}.read _1.fastq.gz ${SAMPLE}.read_2.fastq.gz
 ```
 
@@ -74,13 +78,26 @@ $ fastqc --quiet --threads 6 ${SAMPLE}.read _1.fastq.gz ${SAMPLE}.read_2.fastq.g
 > **NB:** TrimGalore! will only run using multiple cores if you are able to use more than > 5 and > 6 CPUs for single- and paired-end data, respectively. The total cores available to TrimGalore! will also be capped at 4 (7 and 8 CPUs in total for single- and paired-end data, respectively) because there is no longer a run-time benefit. See [release notes](https://github.com/FelixKrueger/TrimGalore/blob/master/Changelog.md#version-060-release-on-1-mar-2019) and [discussion whilst adding this logic to the nf-core/atacseq pipeline](https://github.com/nf-core/atacseq/pull/65).
 
 ```bash
+# Run Trim Galore to trim and filter paired-end FASTQ files
+# The command applies trimming and quality control to remove adapter sequences and low-quality reads.
+
 $ trim_galore \
+    # Pass additional arguments to FastQC, specifying the use of 12 threads for FastQC
     --fastqc_args '-t 12' \
+    
+    # Specify the number of cores to use for trimming, which speeds up the process
     --cores 8 \
+    
+    # Indicate that the input files are paired-end
     --paired \
+    
+    # Output the trimmed files in gzip-compressed format
     --gzip \
+    
+    # Input FASTQ files for trimming
     ${SAMPLE}.read_1.fastq.gz \
     ${SAMPLE}.read_2.fastq.gz
+
 ```
 
 <details markdown="1">
@@ -104,15 +121,53 @@ $ trim_galore \
 [STAR](https://github.com/alexdobin/STAR) is a read aligner designed for splice aware mapping typical of RNA sequencing data. STAR stands for *S*pliced *T*ranscripts *A*lignment to a *R*eference, and has been shown to have high accuracy and outperforms other aligners by more than a factor of 50 in mapping speed, but it is memory intensive. Using `--aligner star_salmon` is the default alignment and quantification option.
 
 ```bash
+# Run the STAR aligner for mapping RNA-Seq reads to a reference genome
+
 $ STAR \
+    # Specify the directory containing STAR genome indices
     --genomeDir star \
+    
+    # Input paired-end FASTQ files for alignment
     --readFilesIn input1/${SAMPLE}_val_1.fq.gz input2/${SAMPLE}_val_2.fq.gz \
+    
+    # Number of threads to use for processing; using 12 threads to speed up the alignment
     --runThreadN 12 \
+    
+    # Prefix for output files
     --outFileNamePrefix $NAME \
-     \
+    
+    # Path to the GTF file containing gene annotations
     --sjdbGTFfile genome.gtf \
-    --outSAMattrRGline 'ID:NAME' 'SM:NAME'  \
-    --quantMode TranscriptomeSAM --twopassMode Basic --outSAMtype BAM Unsorted --readFilesCommand zcat --runRNGseed 0 --outFilterMultimapNmax 20 --alignSJDBoverhangMin 1 --outSAMattributes NH HI AS NM MD --quantTranscriptomeBan Singleend --outSAMstrandField intronMotif
+    
+    # Read group information for SAM file; 'ID' is the read group ID and 'SM' is the sample name
+    --outSAMattrRGline 'ID:NAME' 'SM:NAME' \
+    
+    # Output alignment in transcriptome coordinates; use two-pass mode for better accuracy
+    --quantMode TranscriptomeSAM --twopassMode Basic \
+    
+    # Output format for alignments: BAM format (Unsorted)
+    --outSAMtype BAM Unsorted \
+    
+    # Command to decompress gzip files before processing
+    --readFilesCommand zcat \
+    
+    # Set random number generator seed to 0 for reproducibility
+    --runRNGseed 0 \
+    
+    # Maximum number of multiple alignments allowed per read (default is 10)
+    --outFilterMultimapNmax 20 \
+    
+    # Minimum overhang for splice junctions (1 bp by default)
+    --alignSJDBoverhangMin 1 \
+    
+    # SAM attributes to include in the output: NH (number of hits), HI (hit index), AS (alignment score), NM (edit distance), MD (mismatch string)
+    --outSAMattributes NH HI AS NM MD \
+    
+    # Prevent quantification of single-end reads when running in transcriptome mode
+    --quantTranscriptomeBan Singleend \
+    
+    # Include strand information for each alignment based on intron motif
+    --outSAMstrandField intronMotif
 ```
 
 <details markdown="1">
@@ -285,13 +340,37 @@ If fragmentation occurs before amplification (a common scenario), [picard MarkDu
 In RNA-Seq, varying gene expression levels often result in a higher duplication rate compared to DNA-Seq. For highly expressed genes, a high number of duplicate reads is expected and reasonable, whereas less expressed genes should have fewer duplicate reads.
 
 ```bash
+# Run Picard's MarkDuplicates tool to identify and mark duplicate reads in a BAM file
+
 $ picard \
+    # Set Java heap memory allocation to 29,491 MB (about 29.5 GB) for Picard to use during execution
     -Xmx29491M \
+    
+    # Run the MarkDuplicates tool to identify duplicate reads
     MarkDuplicates \
-    --ASSUME_SORTED true --REMOVE_DUPLICATES false --VALIDATION_STRINGENCY LENIENT --TMP_DIR tmp \
+    
+    # Assume the input BAM file is already sorted. If this were not the case, sorting would be required before marking duplicates
+    --ASSUME_SORTED true \
+    
+    # Do not remove duplicates, just mark them. This means duplicate reads will be flagged but still present in the output file
+    --REMOVE_DUPLICATES false \
+    
+    # Set validation stringency to LENIENT to allow some minor discrepancies and avoid stopping the process due to strict validation errors
+    --VALIDATION_STRINGENCY LENIENT \
+    
+    # Directory for temporary files created during the process
+    --TMP_DIR tmp \
+    
+    # Input BAM file for duplicate marking
     --INPUT ${SAMPLE}.sorted.bam \
+    
+    # Output BAM file with duplicates marked but not removed
     --OUTPUT ${SAMPLE}.markdup.sorted.bam \
+    
+    # Reference genome sequence used for alignment, often necessary for accurate duplicate marking
     --REFERENCE_SEQUENCE genome.fa \
+    
+    # Output file for metrics about duplicate marking, including counts and other statistics
     --METRICS_FILE ${SAMPLE}.markdup.sorted.MarkDuplicates.metrics.txt
 ```
 
@@ -455,12 +534,23 @@ $ bedGraphToBigWig \
 [dupRadar](https://www.bioconductor.org/packages/release/bioc/html/dupRadar.html) is a Bioconductor library written in the R programming language. It generates various QC metrics and plots that relate duplication rate with gene expression levels in order to identify experiments with high technical duplication. A good sample with little technical duplication will only show high numbers of duplicates for highly expressed genes. Samples with technical duplication will have high duplication for all genes, irrespective of transcription level.
 
 ```bash
-$ dupradar.r \
-        ${SAMPLE}.markdup.sorted.bam \
-        ${SAMPLE} \
-        $ genome.gtf \
-        $ strandedness \
-        paired \
+# Run the dupradar R script to assess duplicate rates in RNA-Seq data
+
+$ Rscript dupradar.r \
+    # Path to the input BAM file with duplicates already marked
+    ${SAMPLE}.markdup.sorted.bam \
+    
+    # Prefix for the output files and reports
+    ${SAMPLE} \
+    
+    # Path to the GTF file with gene annotations used for feature-based analysis
+    $ genome.gtf \
+    
+    # Specify the strandedness of the RNA-Seq data (e.g., "forward" or "reverse") or use a flag indicating strandedness information
+    $ strandedness \
+    
+    # Type of RNA-Seq library; 'paired' indicates that paired-end sequencing was used
+    paired
 ```
 
 <details markdown="1">
@@ -494,9 +584,13 @@ The majority of RSeQC scripts generate output files which can be plotted and sum
 #### BAM stat
 
 ```bash
-$ bam_stat.py \
+# Run the bam_stat.py Python script to compute statistics for a BAM file
+
+$ python bam_stat.py \
+    # Specify the input BAM file from which statistics will be calculated
     -i ${SAMPLE}.markdup.sorted.bam \
-     \
+    
+    # Redirect the output of bam_stat.py to a text file for review
     > ${SAMPLE}.bam_stat.txt
 ```
 
@@ -542,12 +636,23 @@ The inner distance script tries to calculate the inner distance between two pair
 This plot will not be generated for single-end data. Very short inner distances are often seen in old or degraded samples (_eg._ FFPE) and values can be negative if the reads overlap consistently.
 
 ```bash
-$ inner_distance.py \
+# Run the inner_distance.py script to calculate inner distance metrics from a BAM file
+
+$ python inner_distance.py \
+    # Specify the input BAM file for which inner distance metrics will be calculated
     -i ${SAMPLE}.markdup.sorted.bam \
+    
+    # Provide the reference BED file containing genomic regions or features for distance calculation
     -r genome.bed \
+    
+    # Specify the prefix for the output files generated by the script
     -o ${SAMPLE} \
-     \
+    
+    # Redirect the standard output of the inner_distance.py script to a text file for review
     > stdout.txt
+
+# Extract the first two lines from the output file and save them to a separate text file
+# This file will contain the mean inner distance value (or other relevant metrics)
 head -n 2 stdout.txt > ${SAMPLE}.inner_distance_mean.txt
 ```
 
