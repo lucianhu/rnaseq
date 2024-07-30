@@ -106,6 +106,7 @@ input: '/path/to/samplesheet.csv'
 outdir: '/path/to/output_dir'
 fasta: '/path/to/references/genome.fa'
 gtf: '/path/to/references/annotation.gtf'
+gene_bed: '/path/to/references/annotation.bed' # If this file is not available, the pipeline will automatically create it
 star_index: '/path/to/genome/star_index_dir'
 save_trimmed: true
 save_align_intermeds: true
