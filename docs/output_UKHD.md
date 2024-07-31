@@ -577,6 +577,13 @@ See [dupRadar docs](https://www.bioconductor.org/packages/devel/bioc/vignettes/d
 
 ### Qualimap
 
+[Qualimap](http://qualimap.bioinfo.cipf.es/) is a platform-independent application written in Java and R that provides both a Graphical User Interface (GUI) and a command-line interface to facilitate the quality control of alignment sequencing data. Shortly, Qualimap:
+
+- Examines sequencing alignment data according to the features of the mapped reads and their genomic properties.
+- Provides an overall view of the data that helps to to the detect biases in the sequencing and/or mapping of the data and eases decision-making for further analysis.
+
+The [Qualimap RNA-seq QC module](http://qualimap.bioinfo.cipf.es/doc_html/analysis.html#rna-seq-qc) is used within this pipeline to assess the overall mapping and coverage relative to gene features.
+
 ```bash
 # Run the Qualimap tool to perform RNA-seq quality control and analysis on a BAM file
 
@@ -614,13 +621,6 @@ $ qualimap \
 - `star_salmon/qualimap/<SAMPLE>/css/`: CSS files required for the HTML report.
 
 </details>
-
-[Qualimap](http://qualimap.bioinfo.cipf.es/) is a platform-independent application written in Java and R that provides both a Graphical User Interface (GUI) and a command-line interface to facilitate the quality control of alignment sequencing data. Shortly, Qualimap:
-
-- Examines sequencing alignment data according to the features of the mapped reads and their genomic properties.
-- Provides an overall view of the data that helps to to the detect biases in the sequencing and/or mapping of the data and eases decision-making for further analysis.
-
-The [Qualimap RNA-seq QC module](http://qualimap.bioinfo.cipf.es/doc_html/analysis.html#rna-seq-qc) is used within this pipeline to assess the overall mapping and coverage relative to gene features.
 
 ![MultiQC - Qualimap gene coverage plot](images/mqc_qualimap_coverage.png)
 
