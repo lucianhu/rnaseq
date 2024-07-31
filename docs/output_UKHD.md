@@ -632,53 +632,35 @@ $ qualimap \
 
 The majority of RSeQC scripts generate output files which can be plotted and summarised in the MultiQC report.
 
-#### BAM stat
+#### Read distribution
+
+This tool calculates how mapped reads are distributed over genomic features. A good result for a standard RNA-seq experiments is generally to have as many exonic reads as possible (`CDS_Exons`). A large amount of intronic reads could be indicative of DNA contamination in your sample but may be expected for a total RNA preparation.
 
 ```bash
-# Run the bam_stat.py Python script to compute statistics for a BAM file
+# Run the read_distribution.py script to analyze read distribution across genomic regions
 
-$ python bam_stat.py \
-    # Specify the input BAM file from which statistics will be calculated
+$ python read_distribution.py \
+    # Specify the input BAM file for which read distribution will be analyzed
     -i ${SAMPLE}.markdup.sorted.bam \
     
-    # Redirect the output of bam_stat.py to a text file for review
-    > ${SAMPLE}.bam_stat.txt
+    # Provide the reference BED file containing genomic regions or features for the distribution analysis
+    -r annotation.bed \
+    
+    # Redirect the output of read_distribution.py to a text file for review
+    > ${SAMPLE}.read_distribution.txt
 ```
 
 <details markdown="1">
 <summary>Output files</summary>
 
-- `star_salmon/rseqc/bam_stat/`
-  - `${SAMPLE}.bam_stat.txt`: Mapping statistics for the BAM file.
+- `star_salmon/rseqc/read_distribution/`
+  - `${SAMPLE}.read_distribution.txt`: File containing fraction of reads mapping to genome feature e.g. CDS exon, 5’UTR exon, 3’ UTR exon, Intron, Intergenic regions etc.
 
 </details>
 
-This script gives numerous statistics about the aligned BAM files. A typical output looks as follows:
+RSeQC documentation: [read_distribution.py](http://rseqc.sourceforge.net/#read-distribution-py)
 
-```txt
-#Output (all numbers are read count)
-#==================================================
-Total records:                                 41465027
-QC failed:                                     0
-Optical/PCR duplicate:                         0
-Non Primary Hits                               8720455
-Unmapped reads:                                0
-
-mapq < mapq_cut (non-unique):                  3127757
-mapq >= mapq_cut (unique):                     29616815
-Read-1:                                        14841738
-Read-2:                                        14775077
-Reads map to '+':                              14805391
-Reads map to '-':                              14811424
-Non-splice reads:                              25455360
-Splice reads:                                  4161455
-Reads mapped in proper pairs:                  21856264
-Proper-paired reads map to different chrom:    7648
-```
-
-MultiQC plots each of these statistics in a dot plot. Each sample in the project is a dot - hover to see the sample highlighted across all fields.
-
-RSeQC documentation: [bam_stat.py](http://rseqc.sourceforge.net/#bam-stat-py)
+![MultiQC - RSeQC read distribution plot](images/mqc_rseqc_readdistribution.png)
 
 #### Inner distance
 
@@ -724,37 +706,37 @@ RSeQC documentation: [inner_distance.py](http://rseqc.sourceforge.net/#inner-dis
 
 ![MultiQC - RSeQC inner distance plot](images/mqc_rseqc_innerdistance.png)
 
-#### Infer experiment
+#### Read duplication
 
-This script predicts the "strandedness" of the protocol (i.e. unstranded, sense or antisense) that was used to prepare the sample for sequencing by assessing the orientation in which aligned reads overlay gene features in the reference genome. The strandedness of each sample has to be provided to the pipeline in the input samplesheet (see [usage docs](https://nf-co.re/rnaseq/usage#samplesheet-input)). However, this information is not always available, especially for public datasets. As a result, additional features have been incorporated into this pipeline to auto-detect whether you have provided the correct information in the samplesheet, and if this is not the case then a warning table will be placed at the top of the MultiQC report highlighting the offending samples (see image below). If required, this will allow you to correct the input samplesheet and rerun the pipeline with the accurate strand information. Note, it is important to get this information right because it can affect the final results.
+This plot shows the number of reads (y-axis) with a given number of exact duplicates (x-axis). Most reads in an RNA-seq library should have a low number of exact duplicates. Samples which have many reads with many duplicates (a large area under the curve) may be suffering excessive technical duplication.
 
 ```bash
-# Run the infer_experiment.py script to infer RNA-seq library type or strandedness from a BAM file
+# Run the read_duplication.py script to analyze read duplication levels in a BAM file
 
-$ python infer_experiment.py \
-    # Specify the input BAM file for which the RNA-seq library type or strandedness will be inferred
+$ python read_duplication.py \
+    # Specify the input BAM file for which read duplication analysis will be performed
     -i ${SAMPLE}.markdup.sorted.bam \
     
-    # Provide the reference BED file containing genomic regions or features used for inference
-    -r annotation.bed \
-    
-    # Redirect the output of the infer_experiment.py script to a text file for review
-    > ${SAMPLE}.infer_experiment.txt
+    # Specify the prefix for the output files generated by the script
+    -o ${SAMPLE}
 ```
 
 <details markdown="1">
 <summary>Output files</summary>
 
-- `star_salmon/rseqc/infer_experiment/`
-  - `${SAMPLE}.infer_experiment.txt`: File containing fraction of reads mapping to given strandedness configurations.
+- `star_salmon/rseqc/read_duplication/pdf/`
+  - `${SAMPLE}.DupRate_plot.pdf`: PDF file containing read duplication plot.
+- `star_salmon/rseqc/read_duplication/rscript/`
+  - `${SAMPLE}.DupRate_plot.r`: R script used to generate pdf plot above.
+- `star_salmon/rseqc/read_duplication/xls/`
+  - `${SAMPLE}.pos.DupRate.xls`: Read duplication rate determined from mapping position of read. First column is “occurrence” or duplication times, second column is number of uniquely mapped reads.
+  - `${SAMPLE}.seq.DupRate.xls`: Read duplication rate determined from sequence of read. First column is “occurrence” or duplication times, second column is number of uniquely mapped reads.
 
 </details>
 
-RSeQC documentation: [infer_experiment.py](http://rseqc.sourceforge.net/#infer-experiment-py)
+RSeQC documentation: [read_duplication.py](http://rseqc.sourceforge.net/#read-duplication-py)
 
-![MultiQC - Strand check table](images/mqc_strand_check.png)
-
-![MultiQC - RSeQC infer experiment plot](images/mqc_rseqc_inferexperiment.png)
+![MultiQC - RSeQC read duplication plot](images/mqc_rseqc_readduplication.png)
 
 #### Junction annotation
 
@@ -831,67 +813,85 @@ RSeQC documentation: [junction_saturation.py](http://rseqc.sourceforge.net/#junc
 
 ![MultiQC - RSeQC junction saturation plot](images/mqc_rseqc_junctionsaturation.png)
 
-#### Read distribution
+#### Infer experiment
 
-This tool calculates how mapped reads are distributed over genomic features. A good result for a standard RNA-seq experiments is generally to have as many exonic reads as possible (`CDS_Exons`). A large amount of intronic reads could be indicative of DNA contamination in your sample but may be expected for a total RNA preparation.
+This script predicts the "strandedness" of the protocol (i.e. unstranded, sense or antisense) that was used to prepare the sample for sequencing by assessing the orientation in which aligned reads overlay gene features in the reference genome. The strandedness of each sample has to be provided to the pipeline in the input samplesheet (see [usage docs](https://nf-co.re/rnaseq/usage#samplesheet-input)). However, this information is not always available, especially for public datasets. As a result, additional features have been incorporated into this pipeline to auto-detect whether you have provided the correct information in the samplesheet, and if this is not the case then a warning table will be placed at the top of the MultiQC report highlighting the offending samples (see image below). If required, this will allow you to correct the input samplesheet and rerun the pipeline with the accurate strand information. Note, it is important to get this information right because it can affect the final results.
 
 ```bash
-# Run the read_distribution.py script to analyze read distribution across genomic regions
+# Run the infer_experiment.py script to infer RNA-seq library type or strandedness from a BAM file
 
-$ python read_distribution.py \
-    # Specify the input BAM file for which read distribution will be analyzed
+$ python infer_experiment.py \
+    # Specify the input BAM file for which the RNA-seq library type or strandedness will be inferred
     -i ${SAMPLE}.markdup.sorted.bam \
     
-    # Provide the reference BED file containing genomic regions or features for the distribution analysis
+    # Provide the reference BED file containing genomic regions or features used for inference
     -r annotation.bed \
     
-    # Redirect the output of read_distribution.py to a text file for review
-    > ${SAMPLE}.read_distribution.txt
+    # Redirect the output of the infer_experiment.py script to a text file for review
+    > ${SAMPLE}.infer_experiment.txt
 ```
 
 <details markdown="1">
 <summary>Output files</summary>
 
-- `star_salmon/rseqc/read_distribution/`
-  - `${SAMPLE}.read_distribution.txt`: File containing fraction of reads mapping to genome feature e.g. CDS exon, 5’UTR exon, 3’ UTR exon, Intron, Intergenic regions etc.
+- `star_salmon/rseqc/infer_experiment/`
+  - `${SAMPLE}.infer_experiment.txt`: File containing fraction of reads mapping to given strandedness configurations.
 
 </details>
 
-RSeQC documentation: [read_distribution.py](http://rseqc.sourceforge.net/#read-distribution-py)
+RSeQC documentation: [infer_experiment.py](http://rseqc.sourceforge.net/#infer-experiment-py)
 
-![MultiQC - RSeQC read distribution plot](images/mqc_rseqc_readdistribution.png)
+![MultiQC - Strand check table](images/mqc_strand_check.png)
 
-#### Read duplication
+![MultiQC - RSeQC infer experiment plot](images/mqc_rseqc_inferexperiment.png)
 
-This plot shows the number of reads (y-axis) with a given number of exact duplicates (x-axis). Most reads in an RNA-seq library should have a low number of exact duplicates. Samples which have many reads with many duplicates (a large area under the curve) may be suffering excessive technical duplication.
+#### BAM stat
 
 ```bash
-# Run the read_duplication.py script to analyze read duplication levels in a BAM file
+# Run the bam_stat.py Python script to compute statistics for a BAM file
 
-$ python read_duplication.py \
-    # Specify the input BAM file for which read duplication analysis will be performed
+$ python bam_stat.py \
+    # Specify the input BAM file from which statistics will be calculated
     -i ${SAMPLE}.markdup.sorted.bam \
     
-    # Specify the prefix for the output files generated by the script
-    -o ${SAMPLE}
+    # Redirect the output of bam_stat.py to a text file for review
+    > ${SAMPLE}.bam_stat.txt
 ```
 
 <details markdown="1">
 <summary>Output files</summary>
 
-- `star_salmon/rseqc/read_duplication/pdf/`
-  - `${SAMPLE}.DupRate_plot.pdf`: PDF file containing read duplication plot.
-- `star_salmon/rseqc/read_duplication/rscript/`
-  - `${SAMPLE}.DupRate_plot.r`: R script used to generate pdf plot above.
-- `star_salmon/rseqc/read_duplication/xls/`
-  - `${SAMPLE}.pos.DupRate.xls`: Read duplication rate determined from mapping position of read. First column is “occurrence” or duplication times, second column is number of uniquely mapped reads.
-  - `${SAMPLE}.seq.DupRate.xls`: Read duplication rate determined from sequence of read. First column is “occurrence” or duplication times, second column is number of uniquely mapped reads.
+- `star_salmon/rseqc/bam_stat/`
+  - `${SAMPLE}.bam_stat.txt`: Mapping statistics for the BAM file.
 
 </details>
 
-RSeQC documentation: [read_duplication.py](http://rseqc.sourceforge.net/#read-duplication-py)
+This script gives numerous statistics about the aligned BAM files. A typical output looks as follows:
 
-![MultiQC - RSeQC read duplication plot](images/mqc_rseqc_readduplication.png)
+```txt
+#Output (all numbers are read count)
+#==================================================
+Total records:                                 41465027
+QC failed:                                     0
+Optical/PCR duplicate:                         0
+Non Primary Hits                               8720455
+Unmapped reads:                                0
+
+mapq < mapq_cut (non-unique):                  3127757
+mapq >= mapq_cut (unique):                     29616815
+Read-1:                                        14841738
+Read-2:                                        14775077
+Reads map to '+':                              14805391
+Reads map to '-':                              14811424
+Non-splice reads:                              25455360
+Splice reads:                                  4161455
+Reads mapped in proper pairs:                  21856264
+Proper-paired reads map to different chrom:    7648
+```
+
+MultiQC plots each of these statistics in a dot plot. Each sample in the project is a dot - hover to see the sample highlighted across all fields.
+
+RSeQC documentation: [bam_stat.py](http://rseqc.sourceforge.net/#bam-stat-py)
 
 ### MultiQC
 
